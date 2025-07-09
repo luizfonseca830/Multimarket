@@ -267,6 +267,7 @@ async function seed() {
   // Create admin user
   await db.insert(adminUsers).values({
     username: "admin",
+    email: "luizfonseca830@gmail.com",
     password: "admin", // Note: In production, this should be hashed
     isActive: true,
   });

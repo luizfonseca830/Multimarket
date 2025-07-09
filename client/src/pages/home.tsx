@@ -93,59 +93,7 @@ export default function Home() {
         onSearch={handleSearch}
       />
 
-      {/* Navigation - Only show when establishment is selected */}
-      {selectedEstablishment && (
-        <nav className="bg-white border-b border-slate-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <div className="flex items-center justify-between h-12">
-                <TabsList className="h-auto p-0 bg-transparent">
-                  <TabsTrigger 
-                    value="products" 
-                    className="h-12 px-4 data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none"
-                  >
-                    Todos os Produtos
-                  </TabsTrigger>
-                  {/* Dynamic category tabs */}
-                  {categories?.map((category) => (
-                    <TabsTrigger 
-                      key={category.id}
-                      value={`category-${category.id}`}
-                      className="h-12 px-4 data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none"
-                      onClick={() => setSelectedCategory(category.id)}
-                    >
-                      {category.name}
-                    </TabsTrigger>
-                  ))}
-                  <TabsTrigger 
-                    value="offers" 
-                    className="h-12 px-4 data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none"
-                  >
-                    Ofertas
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="featured" 
-                    className="h-12 px-4 data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none"
-                  >
-                    Novidades
-                  </TabsTrigger>
-                </TabsList>
-                <div className="flex items-center space-x-4">
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => setActiveTab("admin")}
-                    className="text-slate-600 hover:text-primary"
-                  >
-                    <UtensilsCrossed className="mr-1" size={16} />
-                    Admin
-                  </Button>
-                </div>
-              </div>
-            </Tabs>
-          </div>
-        </nav>
-      )}
+
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>

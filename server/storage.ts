@@ -63,6 +63,7 @@ export interface IStorage {
   
   // Admin Authentication
   authenticateAdmin(username: string, password: string): Promise<AdminUser | null>;
+  getAdminByEmail(email: string): Promise<AdminUser | null>;
   
   // Dashboard Stats
   getDashboardStats(establishmentId: number): Promise<{
@@ -356,6 +357,18 @@ export class DatabaseStorage implements IStorage {
       .where(and(
         eq(adminUsers.username, username),
         eq(adminUsers.password, password),
+        eq(adminUsers.isActive, true)
+      ));
+    
+    return admin || null;
+  }
+
+  async getAdminByEmail(email: string): Promise<AdminUser | null> {
+    const [admin] = await db
+      .select()
+      .from(adminUsers)
+      .where(and(
+        eq(adminUsers.email, email),
         eq(adminUsers.isActive, true)
       ));
     

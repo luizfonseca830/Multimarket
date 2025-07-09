@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Lock, User } from "lucide-react";
+import { PasswordRecovery } from "./password-recovery";
 
 interface AdminLoginProps {
   onLoginSuccess: () => void;
@@ -15,6 +16,7 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPasswordRecovery, setShowPasswordRecovery] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,6 +50,10 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
       setIsLoading(false);
     }
   };
+
+  if (showPasswordRecovery) {
+    return <PasswordRecovery onBackToLogin={() => setShowPasswordRecovery(false)} />;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
@@ -103,6 +109,16 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
               {isLoading ? "Entrando..." : "Entrar"}
             </Button>
           </form>
+          
+          <div className="mt-4 text-center">
+            <Button 
+              variant="link" 
+              className="text-sm text-gray-600 hover:text-primary"
+              onClick={() => setShowPasswordRecovery(true)}
+            >
+              Esqueceu sua senha?
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

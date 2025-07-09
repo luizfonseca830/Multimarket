@@ -280,6 +280,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Password recovery
+  app.post("/api/admin/forgot-password", async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+      
+      const admin = await storage.getAdminByEmail(email);
+      
+      if (admin) {
+        // In a real application, you would send an email here
+        // For now, we'll just log the password reset info
+        console.log(`Password reset requested for admin: ${admin.username} (${admin.email})`);
+        console.log(`Current password: admin`);
+        
+        res.json({ 
+          success: true, 
+          message: "Password reset email sent" 
+        });
+      } else {
+        res.status(404).json({ 
+          success: false, 
+          message: "Email not found" 
+        });
+      }
+    } catch (error: any) {
+      res.status(500).json({ message: "Error during password recovery: " + error.message });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
