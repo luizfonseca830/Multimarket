@@ -42,11 +42,12 @@ export function Header({ selectedEstablishment, onEstablishmentChange, onSearch,
             {/* Mobile Actions */}
             <div className="flex items-center space-x-2">
               {/* Home Button Mobile */}
-              {selectedEstablishment && (
+              {selectedEstablishment && onHome && (
                 <Button 
                   variant="ghost" 
                   size="sm"
                   onClick={onHome}
+                  className="text-slate-600 hover:text-slate-900"
                 >
                   <Home size={16} />
                 </Button>
@@ -106,10 +107,10 @@ export function Header({ selectedEstablishment, onEstablishmentChange, onSearch,
                 <h1 className="text-xl font-bold text-slate-900">Multi Store</h1>
                 <p className="text-xs text-slate-500">Rede de Estabelecimentos</p>
               </div>
-              {selectedEstablishment && (
+              {selectedEstablishment && onHome && (
                 <Button 
                   variant="ghost" 
-                  className="ml-4 flex items-center space-x-2"
+                  className="ml-4 flex items-center space-x-2 text-slate-600 hover:text-slate-900"
                   onClick={onHome}
                 >
                   <Home size={16} />

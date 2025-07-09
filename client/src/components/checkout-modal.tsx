@@ -350,10 +350,7 @@ function CheckoutForm({ onClose, cartItems, total }: Omit<CheckoutModalProps, 'i
 
         {/* Action Buttons */}
         <div className="flex space-x-4">
-          <Button type="button" variant="outline" onClick={() => {
-            dispatch({ type: "OPEN_CART" });
-            onClose();
-          }} className="flex-1">
+          <Button type="button" variant="outline" onClick={onClose} className="flex-1">
             Cancelar
           </Button>
           {paymentMethod === "credit_card" && clientSecret ? (
@@ -372,15 +369,6 @@ function CheckoutForm({ onClose, cartItems, total }: Omit<CheckoutModalProps, 'i
 }
 
 export function CheckoutModal({ isOpen, onClose, cartItems, total }: CheckoutModalProps) {
-  const { dispatch } = useCart();
-  
-  // Fechar o carrinho quando o modal de checkout abrir
-  useEffect(() => {
-    if (isOpen) {
-      dispatch({ type: "CLOSE_CART" });
-    }
-  }, [isOpen, dispatch]);
-
   if (!isOpen) return null;
 
   return (
@@ -389,10 +377,7 @@ export function CheckoutModal({ isOpen, onClose, cartItems, total }: CheckoutMod
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-slate-900">Finalizar Compra</h2>
-            <Button variant="ghost" size="icon" onClick={() => {
-              dispatch({ type: "OPEN_CART" });
-              onClose();
-            }}>
+            <Button variant="ghost" size="icon" onClick={onClose}>
               <X size={20} />
             </Button>
           </div>
