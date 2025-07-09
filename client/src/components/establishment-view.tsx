@@ -140,19 +140,114 @@ export function EstablishmentView({ establishment, onBack }: EstablishmentViewPr
         </div>
       </div>
 
-      {/* Products Grid */}
+      {/* Ordering Section */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">
-            {selectedCategory 
-              ? `Produtos - ${categories?.find(c => c.id === selectedCategory)?.name}`
-              : "Todos os Produtos"
-            }
-          </h2>
-          <Badge variant="secondary">
-            {filteredProducts?.length || 0} produtos
-          </Badge>
+        <h2 className="text-xl font-semibold text-slate-900">ORDENAR</h2>
+        
+        <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
+          <button className="flex flex-col items-center p-4 border-2 border-slate-200 rounded-lg hover:border-orange-500 transition-colors">
+            <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center mb-2">
+              <svg viewBox="0 0 24 24" className="w-5 h-5 text-slate-600">
+                <path fill="currentColor" d="M7 14l5-5 5 5z"/>
+              </svg>
+            </div>
+            <span className="text-xs font-medium text-slate-700 text-center">MAIOR PREÇO</span>
+          </button>
+          
+          <button className="flex flex-col items-center p-4 border-2 border-slate-200 rounded-lg hover:border-orange-500 transition-colors">
+            <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center mb-2">
+              <svg viewBox="0 0 24 24" className="w-5 h-5 text-slate-600">
+                <path fill="currentColor" d="M7 10l5 5 5-5z"/>
+              </svg>
+            </div>
+            <span className="text-xs font-medium text-slate-700 text-center">MENOR PREÇO</span>
+          </button>
+          
+          <button className="flex flex-col items-center p-4 border-2 border-orange-500 bg-orange-50 rounded-lg">
+            <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mb-2">
+              <svg viewBox="0 0 24 24" className="w-5 h-5 text-orange-600">
+                <path fill="currentColor" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+            </div>
+            <span className="text-xs font-medium text-orange-700 text-center">MAIS VENDIDOS</span>
+          </button>
+          
+          <button className="flex flex-col items-center p-4 border-2 border-slate-200 rounded-lg hover:border-orange-500 transition-colors">
+            <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center mb-2">
+              <svg viewBox="0 0 24 24" className="w-5 h-5 text-slate-600">
+                <path fill="currentColor" d="M9 3v2H5v14h4v2H3V3h6zm12 0v18h-8v-2h6V5h-6V3h8z"/>
+              </svg>
+            </div>
+            <span className="text-xs font-medium text-slate-700 text-center">MAIOR DESCONTO</span>
+          </button>
+          
+          <button className="flex flex-col items-center p-4 border-2 border-slate-200 rounded-lg hover:border-orange-500 transition-colors">
+            <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center mb-2">
+              <span className="text-xs font-bold text-slate-600">A-Z</span>
+            </div>
+            <span className="text-xs font-medium text-slate-700 text-center">DE A A Z</span>
+          </button>
+          
+          <button className="flex flex-col items-center p-4 border-2 border-slate-200 rounded-lg hover:border-orange-500 transition-colors">
+            <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center mb-2">
+              <span className="text-xs font-bold text-slate-600">Z-A</span>
+            </div>
+            <span className="text-xs font-medium text-slate-700 text-center">DE Z A A</span>
+          </button>
         </div>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Sidebar - Categories */}
+        <div className="lg:col-span-1">
+          <div className="bg-white rounded-lg border border-slate-200 p-4 sticky top-4">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">CATEGORIAS</h3>
+            <div className="space-y-2">
+              <button
+                onClick={() => setSelectedCategory(null)}
+                className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                  selectedCategory === null 
+                    ? 'bg-orange-100 text-orange-700 font-medium' 
+                    : 'hover:bg-slate-50 text-slate-700'
+                }`}
+              >
+                TODOS ({products?.length || 0})
+              </button>
+              
+              {categories?.map((category) => {
+                const categoryProducts = products?.filter(p => p.categoryId === category.id) || [];
+                return (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category.id)}
+                    className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                      selectedCategory === category.id 
+                        ? 'bg-orange-100 text-orange-700 font-medium' 
+                        : 'hover:bg-slate-50 text-slate-700'
+                    }`}
+                  >
+                    {category.name.toUpperCase()} ({categoryProducts.length})
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Products Grid */}
+        <div className="lg:col-span-3 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-slate-900">
+              {selectedCategory 
+                ? `${categories?.find(c => c.id === selectedCategory)?.name.toUpperCase()}`
+                : "TODOS OS PRODUTOS"
+              }
+            </h2>
+            <Badge variant="secondary">
+              {filteredProducts?.length || 0} produtos
+            </Badge>
+          </div>
 
         {productsLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -258,6 +353,7 @@ export function EstablishmentView({ establishment, onBack }: EstablishmentViewPr
             ))}
           </div>
         )}
+        </div>
       </div>
     </div>
   );
