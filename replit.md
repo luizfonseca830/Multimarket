@@ -1,39 +1,58 @@
-# Multi-Store E-commerce Platform
+# Plataforma de E-commerce Multi-Estabelecimentos
 
-## Overview
+## Visão Geral
 
-This is a full-stack e-commerce application built with React, TypeScript, Express, and PostgreSQL. The platform supports multiple types of establishments (supermarkets, butchers, bakeries) with a unified shopping cart and checkout system. The application features a modern UI built with shadcn/ui components and includes both customer-facing and admin interfaces.
+Esta é uma aplicação de e-commerce completa construída com React, TypeScript, Express e PostgreSQL. A plataforma suporta múltiplos tipos de estabelecimentos (supermercados, açougues, padarias) com um sistema unificado de carrinho de compras e checkout. A aplicação possui uma interface moderna construída com componentes shadcn/ui e inclui interfaces tanto para clientes quanto para administradores.
 
-The system is designed for a single owner managing multiple establishments (supermarket, butcher shop, bakery) with:
-- Product catalog management per establishment
-- Category-based product organization
-- Shopping cart with PIX and credit card payments
-- Administrative dashboard for payment control
-- Order management and tracking
+O sistema é projetado para um único proprietário gerenciando múltiplos estabelecimentos (supermercado, açougue, padaria) com:
+- Gerenciamento de catálogo de produtos por estabelecimento
+- Organização de produtos baseada em categorias
+- Carrinho de compras com pagamentos PIX e cartão de crédito
+- Painel administrativo para controle de pagamentos
+- Gestão e acompanhamento de pedidos
 
-## User Preferences
+## Preferências do Usuário
 
-Preferred communication style: Simple, everyday language.
-Language: Portuguese (Brazilian)
+Estilo de comunicação preferido: Linguagem simples e cotidiana.
+Idioma: Português (Brasileiro)
 
-## Recent Changes (July 2025)
+## Mudanças Recentes (Janeiro 2025)
 
-### Complete Global Search System & Establishment Navigation (Current)
-- **Unified Search Experience**: Implemented comprehensive global search with establishment navigation
-- **Global Search Component**: Created unified search that simultaneously searches establishments, products, and categories
-- **Establishment Detail View**: Added dedicated establishment pages showing products and categories
-- **Enhanced User Flow**:
-  1. User starts on homepage with global search or establishment selection
-  2. Clicking establishment shows its products organized by categories
-  3. Global search works across all establishments, products, and categories
-  4. Results displayed in organized tabs (All, Establishments, Products, Categories)
-  5. Home button appears when viewing establishment details
-- **Navigation Improvements**: 
-  - Home button in header when establishment is selected
-  - Back button in establishment view
-  - Category filtering within establishments
-- **Mobile Optimization**: Added specific CSS optimizations for Galaxy S23 Ultra (428x915px)
-- **Responsive Design**: Enhanced responsiveness with mobile-first approach
+### Sistema de Checkout Completo e Melhorias na Interface (Atual - Janeiro 2025)
+- **Corrigido Fluxo do Modal de Checkout**: Resolvido problema onde o modal de checkout não abria adequadamente
+- **Experiência do Usuário Melhorada**: 
+  - Modal agora abre sobre o carrinho sem fechá-lo
+  - Usuários podem facilmente retornar ao carrinho se cancelarem o checkout
+  - Transição suave entre carrinho e checkout
+- **Exibição de Produtos Aprimorada**:
+  - Corrigidas imagens de produtos em todos os componentes
+  - Formatação adequada de preços com duas casas decimais
+  - Funcionalidade consistente de adicionar ao carrinho
+- **Melhorias no Carrinho**:
+  - Adicionado CartSidebar a todas as páginas
+  - Resumo completo do carrinho com subtotal, taxa de entrega e total
+  - Melhores controles de quantidade e remoção de itens
+- **Correções de Navegação**:
+  - Corrigida exibição do botão Home quando estabelecimento é selecionado
+  - Design responsivo melhorado para dispositivos móveis
+- **Integração de Pagamento**: Suporte a PIX e cartão de crédito com integração Stripe
+
+### Sistema de Busca Global Completo e Navegação de Estabelecimentos
+- **Experiência de Busca Unificada**: Implementada busca global abrangente com navegação de estabelecimentos
+- **Componente de Busca Global**: Criada busca unificada que busca simultaneamente estabelecimentos, produtos e categorias
+- **Visualização Detalhada de Estabelecimentos**: Adicionadas páginas dedicadas de estabelecimentos mostrando produtos e categorias
+- **Fluxo de Usuário Aprimorado**:
+  1. Usuário inicia na página inicial com busca global ou seleção de estabelecimento
+  2. Clicar no estabelecimento mostra seus produtos organizados por categorias
+  3. Busca global funciona em todos os estabelecimentos, produtos e categorias
+  4. Resultados exibidos em abas organizadas (Todos, Estabelecimentos, Produtos, Categorias)
+  5. Botão Home aparece ao visualizar detalhes do estabelecimento
+- **Melhorias na Navegação**: 
+  - Botão Home no cabeçalho quando estabelecimento é selecionado
+  - Botão Voltar na visualização do estabelecimento
+  - Filtragem de categorias dentro dos estabelecimentos
+- **Otimização Mobile**: Adicionadas otimizações CSS específicas para Galaxy S23 Ultra (428x915px)
+- **Design Responsivo**: Responsividade aprimorada com abordagem mobile-first
 
 ### Enhanced Homepage and User Experience
 - **New Homepage Layout**: Created a welcoming homepage that displays all establishments first, allowing users to choose before shopping
