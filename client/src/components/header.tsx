@@ -2,7 +2,6 @@ import { Search, ShoppingCart, User, Store, Shield, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/lib/cart-context";
-import { EstablishmentSelector } from "./establishment-selector";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 
@@ -41,6 +40,15 @@ export function Header({ selectedEstablishment, onEstablishmentChange, onSearch 
 
             {/* Mobile Actions */}
             <div className="flex items-center space-x-2">
+              {/* Home Button Mobile */}
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => window.location.href = "/"}
+              >
+                <Home size={16} />
+              </Button>
+
               {/* Cart Button Mobile */}
               <Button
                 onClick={() => dispatch({ type: "TOGGLE_CART" })}
@@ -71,21 +79,13 @@ export function Header({ selectedEstablishment, onEstablishmentChange, onSearch 
             <form onSubmit={handleSearchSubmit} className="relative">
               <Input
                 type="text"
-                placeholder="Buscar produtos..."
+                placeholder="Buscar estabelecimentos, produtos ou categorias..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 text-sm"
               />
               <Search className="absolute left-3 top-3 text-slate-400" size={16} />
             </form>
-          </div>
-
-          {/* Mobile Establishment Selector */}
-          <div className="pb-3 px-1">
-            <EstablishmentSelector
-              selectedEstablishment={selectedEstablishment}
-              onEstablishmentChange={onEstablishmentChange}
-            />
           </div>
         </div>
 
@@ -115,19 +115,14 @@ export function Header({ selectedEstablishment, onEstablishmentChange, onSearch 
 
             {/* Center Section */}
             <div className="flex items-center space-x-4">
-              <EstablishmentSelector
-                selectedEstablishment={selectedEstablishment}
-                onEstablishmentChange={onEstablishmentChange}
-              />
-
               {/* Search Bar */}
               <form onSubmit={handleSearchSubmit} className="relative">
                 <Input
                   type="text"
-                  placeholder="Buscar produtos..."
+                  placeholder="Buscar estabelecimentos, produtos ou categorias..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-80 pl-10"
+                  className="w-96 pl-10"
                 />
                 <Search className="absolute left-3 top-3 text-slate-400" size={16} />
               </form>

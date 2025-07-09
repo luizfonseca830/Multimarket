@@ -45,6 +45,8 @@ export interface IStorage {
   createProduct(product: InsertProduct): Promise<Product>;
   updateProduct(id: number, product: Partial<InsertProduct>): Promise<Product>;
   searchProducts(establishmentId: number, query: string): Promise<ProductWithCategory[]>;
+  searchAllProducts(query: string): Promise<ProductWithCategory[]>;
+  searchAllCategories(query: string): Promise<Category[]>;
   
   // Orders
   getOrdersByEstablishment(establishmentId: number): Promise<OrderWithItems[]>;
@@ -255,6 +257,47 @@ export class DatabaseStorage implements IStorage {
       )
     )
     .orderBy(products.name);
+  }
+
+  async searchAllProducts(query: string): Promise<ProductWithCategory[]> {
+    return await db.select({
+      id: products.id,
+      name: products.name,
+      description: products.description,
+      price: products.price,
+      originalPrice: products.originalPrice,
+      unit: products.unit,
+      stock: products.stock,
+      imageUrl: products.imageUrl,
+      isActive: products.isActive,
+      isFeatured: products.isFeatured,
+      categoryId: products.categoryId,
+      establishmentId: products.establishmentId,
+      createdAt: products.createdAt,
+      category: categories
+    })
+    .from(products)
+    .innerJoin(categories, eq(products.categoryId, categories.id))
+    .where(
+      and(
+        eq(products.isActive, true),
+        or(
+          ilike(products.name, `%${query}%`),
+          ilike(products.description, `%${query}%`),
+          ilike(categories.name, `%${query}%`)
+        )
+      )
+    )
+    .orderBy(products.name)
+    .limit(20);
+  }
+
+  async searchAllCategories(query: string): Promise<Category[]> {
+    return await db.select()
+      .from(categories)
+      .where(ilike(categories.name, `%${query}%`))
+      .orderBy(categories.name)
+      .limit(20);
   }
 
   // Orders

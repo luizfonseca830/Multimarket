@@ -107,6 +107,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Global search for products
+  app.get("/api/products/search/:query", async (req, res) => {
+    try {
+      const query = req.params.query;
+      const products = await storage.searchAllProducts(query);
+      res.json(products);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error searching all products: " + error.message });
+    }
+  });
+
+  // Global search for categories
+  app.get("/api/categories/search/:query", async (req, res) => {
+    try {
+      const query = req.params.query;
+      const categories = await storage.searchAllCategories(query);
+      res.json(categories);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error searching all categories: " + error.message });
+    }
+  });
+
   app.get("/api/products/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
