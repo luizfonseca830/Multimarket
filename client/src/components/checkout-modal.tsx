@@ -369,26 +369,10 @@ function CheckoutForm({ onClose, cartItems, total }: Omit<CheckoutModalProps, 'i
 }
 
 export function CheckoutModal({ isOpen, onClose, cartItems, total }: CheckoutModalProps) {
-  const { dispatch } = useCart();
-  const hasClosedCart = useRef(false);
-  
-  // Fechar o carrinho quando o modal de checkout abrir (apenas uma vez)
-  useEffect(() => {
-    if (isOpen && !hasClosedCart.current) {
-      hasClosedCart.current = true;
-      setTimeout(() => {
-        dispatch({ type: "CLOSE_CART" });
-      }, 100);
-    }
-    if (!isOpen) {
-      hasClosedCart.current = false;
-    }
-  }, [isOpen, dispatch]);
-
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
