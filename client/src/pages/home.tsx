@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/header";
 import { GlobalSearch } from "@/components/global-search";
 import { EstablishmentView } from "@/components/establishment-view";
+import { CartSidebar } from "@/components/cart-sidebar";
 import { useCart } from "@/lib/cart-context";
 import { Store, ShoppingCart, Star } from "lucide-react";
 import { Establishment, Category, ProductWithCategory } from "@shared/schema";
@@ -184,6 +185,8 @@ export default function Home() {
           </div>
         )}
       </div>
+      
+      <CartSidebar />
     </div>
   );
 }

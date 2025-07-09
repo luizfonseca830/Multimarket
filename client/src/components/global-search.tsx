@@ -189,7 +189,7 @@ export function GlobalSearch({
                       <h4 className="font-semibold text-slate-900 text-sm line-clamp-1">{product.name}</h4>
                       <p className="text-xs text-slate-600 line-clamp-2">{product.description}</p>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold text-slate-900">R$ {product.price}</span>
+                        <span className="text-sm font-bold text-slate-900">R$ {parseFloat(product.price).toFixed(2)}</span>
                         <ArrowRight className="text-slate-400" size={14} />
                       </div>
                     </div>

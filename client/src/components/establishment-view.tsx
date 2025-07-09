@@ -120,8 +120,18 @@ export function EstablishmentView({ establishment, onBack }: EstablishmentViewPr
             {filteredProducts?.map((product) => (
               <Card key={product.id} className="group hover:shadow-md transition-shadow">
                 <CardContent className="p-3">
-                  <div className="aspect-square bg-slate-100 rounded-lg mb-3 flex items-center justify-center">
-                    <ShoppingCart className="text-slate-400" size={24} />
+                  <div className="aspect-square bg-slate-100 rounded-lg mb-3 overflow-hidden">
+                    {product.imageUrl ? (
+                      <img 
+                        src={product.imageUrl} 
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <ShoppingCart className="text-slate-400" size={24} />
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <h3 className="font-medium text-slate-900 line-clamp-2 text-sm">
@@ -137,7 +147,7 @@ export function EstablishmentView({ establishment, onBack }: EstablishmentViewPr
                       <Button
                         size="sm"
                         onClick={() => handleAddToCart(product)}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="transition-all hover:bg-primary/90"
                       >
                         <Plus size={14} />
                       </Button>
