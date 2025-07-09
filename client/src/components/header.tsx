@@ -9,9 +9,10 @@ interface HeaderProps {
   selectedEstablishment: any;
   onEstablishmentChange: (establishment: any) => void;
   onSearch?: (query: string) => void;
+  onHome?: () => void;
 }
 
-export function Header({ selectedEstablishment, onEstablishmentChange, onSearch }: HeaderProps) {
+export function Header({ selectedEstablishment, onEstablishmentChange, onSearch, onHome }: HeaderProps) {
   const { state: cartState, dispatch } = useCart();
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -41,13 +42,15 @@ export function Header({ selectedEstablishment, onEstablishmentChange, onSearch 
             {/* Mobile Actions */}
             <div className="flex items-center space-x-2">
               {/* Home Button Mobile */}
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => window.location.href = "/"}
-              >
-                <Home size={16} />
-              </Button>
+              {selectedEstablishment && (
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={onHome}
+                >
+                  <Home size={16} />
+                </Button>
+              )}
 
               {/* Cart Button Mobile */}
               <Button
@@ -103,14 +106,16 @@ export function Header({ selectedEstablishment, onEstablishmentChange, onSearch 
                 <h1 className="text-xl font-bold text-slate-900">Multi Store</h1>
                 <p className="text-xs text-slate-500">Rede de Estabelecimentos</p>
               </div>
-              <Button 
-                variant="ghost" 
-                className="ml-4 flex items-center space-x-2"
-                onClick={() => window.location.href = "/"}
-              >
-                <Home size={16} />
-                <span className="text-sm">Home</span>
-              </Button>
+              {selectedEstablishment && (
+                <Button 
+                  variant="ghost" 
+                  className="ml-4 flex items-center space-x-2"
+                  onClick={onHome}
+                >
+                  <Home size={16} />
+                  <span className="text-sm">Home</span>
+                </Button>
+              )}
             </div>
 
             {/* Center Section */}

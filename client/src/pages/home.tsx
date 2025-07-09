@@ -4,12 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/header";
 import { GlobalSearch } from "@/components/global-search";
+import { EstablishmentView } from "@/components/establishment-view";
 import { useCart } from "@/lib/cart-context";
 import { Store, ShoppingCart, Star } from "lucide-react";
 import { Establishment, Category, ProductWithCategory } from "@shared/schema";
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedEstablishment, setSelectedEstablishment] = useState<Establishment | null>(null);
   const { state: cartState, dispatch } = useCart();
 
   const { data: establishments, isLoading: establishmentsLoading } = useQuery<Establishment[]>({
@@ -21,8 +23,8 @@ export default function Home() {
   };
 
   const handleEstablishmentSelect = (establishment: Establishment) => {
-    // Quando um estabelecimento é selecionado, pode mostrar seus produtos
-    setSearchQuery(establishment.name);
+    setSelectedEstablishment(establishment);
+    setSearchQuery("");
   };
 
   const handleProductSelect = (product: ProductWithCategory) => {
@@ -39,16 +41,27 @@ export default function Home() {
     setSearchQuery("");
   };
 
+  const handleBackToHome = () => {
+    setSelectedEstablishment(null);
+    setSearchQuery("");
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
       <Header
-        selectedEstablishment={null}
+        selectedEstablishment={selectedEstablishment}
         onEstablishmentChange={handleEstablishmentSelect}
         onSearch={handleSearch}
+        onHome={handleBackToHome}
       />
       
       <div className="container mx-auto px-4 py-6">
-        {searchQuery ? (
+        {selectedEstablishment ? (
+          <EstablishmentView
+            establishment={selectedEstablishment}
+            onBack={handleBackToHome}
+          />
+        ) : searchQuery ? (
           <GlobalSearch
             query={searchQuery}
             onClearSearch={handleClearSearch}
