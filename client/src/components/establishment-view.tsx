@@ -115,15 +115,7 @@ export function EstablishmentView({ establishment, onBack }: EstablishmentViewPr
 
       {/* Category Filter */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-slate-900">PRODUTOS</h2>
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-slate-600">Ordenar por:</span>
-            <Button variant="outline" size="sm">Preço ↑</Button>
-            <Button variant="outline" size="sm">Preço ↓</Button>
-            <Button variant="outline" size="sm">Nome A-Z</Button>
-          </div>
-        </div>
+        <h2 className="text-xl font-semibold text-slate-900">PRODUTOS</h2>
         
         <div className="flex flex-wrap gap-2">
           <Button
