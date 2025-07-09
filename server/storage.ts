@@ -22,7 +22,7 @@ import {
   type CategoryWithProducts
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { eq, and, desc, sql, or, ilike } from "drizzle-orm";
 
 export interface IStorage {
   // Establishments
@@ -42,6 +42,7 @@ export interface IStorage {
   getProduct(id: number): Promise<ProductWithCategory | undefined>;
   createProduct(product: InsertProduct): Promise<Product>;
   updateProduct(id: number, product: Partial<InsertProduct>): Promise<Product>;
+  searchProducts(establishmentId: number, query: string): Promise<ProductWithCategory[]>;
   
   // Orders
   getOrdersByEstablishment(establishmentId: number): Promise<OrderWithItems[]>;
@@ -215,6 +216,39 @@ export class DatabaseStorage implements IStorage {
   async updateProduct(id: number, product: Partial<InsertProduct>): Promise<Product> {
     const [updatedProduct] = await db.update(products).set(product).where(eq(products.id, id)).returning();
     return updatedProduct;
+  }
+
+  async searchProducts(establishmentId: number, query: string): Promise<ProductWithCategory[]> {
+    return await db.select({
+      id: products.id,
+      name: products.name,
+      description: products.description,
+      price: products.price,
+      originalPrice: products.originalPrice,
+      unit: products.unit,
+      stock: products.stock,
+      imageUrl: products.imageUrl,
+      isActive: products.isActive,
+      isFeatured: products.isFeatured,
+      categoryId: products.categoryId,
+      establishmentId: products.establishmentId,
+      createdAt: products.createdAt,
+      category: categories
+    })
+    .from(products)
+    .innerJoin(categories, eq(products.categoryId, categories.id))
+    .where(
+      and(
+        eq(products.establishmentId, establishmentId),
+        eq(products.isActive, true),
+        or(
+          ilike(products.name, `%${query}%`),
+          ilike(products.description, `%${query}%`),
+          ilike(categories.name, `%${query}%`)
+        )
+      )
+    )
+    .orderBy(products.name);
   }
 
   // Orders

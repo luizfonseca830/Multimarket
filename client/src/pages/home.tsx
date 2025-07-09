@@ -8,7 +8,8 @@ import { Header } from "@/components/header";
 import { ProductGrid } from "@/components/product-grid";
 import { CartSidebar } from "@/components/cart-sidebar";
 import { AdminDashboard } from "@/components/admin-dashboard";
-import { Establishment, Category } from "@shared/schema";
+import { SearchResults } from "@/components/search-results";
+import { Establishment, Category, Offer } from "@shared/schema";
 import { 
   Truck, 
   Shield, 
@@ -20,18 +21,47 @@ import {
   Pizza,
   Croissant,
   SprayCan,
-  Baby
+  Baby,
+  Store,
+  MapPin,
+  Clock
 } from "lucide-react";
 
 export default function Home() {
   const [selectedEstablishment, setSelectedEstablishment] = useState<Establishment | null>(null);
-  const [activeTab, setActiveTab] = useState("products");
+  const [activeTab, setActiveTab] = useState("home");
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const { data: establishments } = useQuery<Establishment[]>({
+    queryKey: ['/api/establishments'],
+  });
 
   const { data: categories } = useQuery<Category[]>({
     queryKey: ['/api/establishments', selectedEstablishment?.id, 'categories'],
     enabled: !!selectedEstablishment?.id,
   });
+
+  const { data: offers } = useQuery<Offer[]>({
+    queryKey: ['/api/establishments', selectedEstablishment?.id, 'offers'],
+    enabled: !!selectedEstablishment?.id,
+  });
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setActiveTab("search");
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setActiveTab("home");
+  };
+
+  const handleEstablishmentSelect = (establishment: Establishment) => {
+    setSelectedEstablishment(establishment);
+    setActiveTab("products");
+    setSelectedCategory(null);
+  };
 
   const getCategoryIcon = (name: string) => {
     const iconName = name.toLowerCase();
@@ -60,72 +90,75 @@ export default function Home() {
       <Header 
         selectedEstablishment={selectedEstablishment}
         onEstablishmentChange={setSelectedEstablishment}
+        onSearch={handleSearch}
       />
 
-      {/* Navigation */}
-      <nav className="bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <div className="flex items-center justify-between h-12">
-              <TabsList className="h-auto p-0 bg-transparent">
-                <TabsTrigger 
-                  value="products" 
-                  className="h-12 px-4 data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none"
-                >
-                  Todos os Produtos
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="offers" 
-                  className="h-12 px-4 data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none"
-                >
-                  Ofertas
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="categories" 
-                  className="h-12 px-4 data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none"
-                >
-                  Categorias
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="featured" 
-                  className="h-12 px-4 data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none"
-                >
-                  Novidades
-                </TabsTrigger>
-              </TabsList>
-              <div className="flex items-center space-x-4">
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => setActiveTab("admin")}
-                  className="text-slate-600 hover:text-primary"
-                >
-                  <UtensilsCrossed className="mr-1" size={16} />
-                  Admin
-                </Button>
+      {/* Navigation - Only show when establishment is selected */}
+      {selectedEstablishment && (
+        <nav className="bg-white border-b border-slate-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <div className="flex items-center justify-between h-12">
+                <TabsList className="h-auto p-0 bg-transparent">
+                  <TabsTrigger 
+                    value="products" 
+                    className="h-12 px-4 data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none"
+                  >
+                    Todos os Produtos
+                  </TabsTrigger>
+                  {/* Dynamic category tabs */}
+                  {categories?.map((category) => (
+                    <TabsTrigger 
+                      key={category.id}
+                      value={`category-${category.id}`}
+                      className="h-12 px-4 data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none"
+                      onClick={() => setSelectedCategory(category.id)}
+                    >
+                      {category.name}
+                    </TabsTrigger>
+                  ))}
+                  <TabsTrigger 
+                    value="offers" 
+                    className="h-12 px-4 data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none"
+                  >
+                    Ofertas
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="featured" 
+                    className="h-12 px-4 data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none"
+                  >
+                    Novidades
+                  </TabsTrigger>
+                </TabsList>
+                <div className="flex items-center space-x-4">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setActiveTab("admin")}
+                    className="text-slate-600 hover:text-primary"
+                  >
+                    <UtensilsCrossed className="mr-1" size={16} />
+                    Admin
+                  </Button>
+                </div>
               </div>
-            </div>
-          </Tabs>
-        </div>
-      </nav>
+            </Tabs>
+          </div>
+        </nav>
+      )}
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsContent value="products" className="space-y-12">
+          {/* Home Page - Show when no establishment is selected */}
+          <TabsContent value="home" className="space-y-12">
             {/* Hero Section */}
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
                 <div className="relative bg-gradient-to-r from-secondary to-emerald-600 rounded-2xl overflow-hidden h-64">
                   <div className="absolute inset-0 bg-black bg-opacity-20"></div>
                   <div className="relative z-10 p-8 h-full flex flex-col justify-center">
-                    <h2 className="text-3xl font-bold text-white mb-4">Ofertas Especiais</h2>
-                    <p className="text-white text-lg mb-6">Até 50% de desconto em produtos selecionados</p>
-                    <Button 
-                      className="bg-white text-secondary hover:bg-slate-50 w-fit"
-                      onClick={() => setActiveTab("offers")}
-                    >
-                      Ver Ofertas
-                    </Button>
+                    <h2 className="text-3xl font-bold text-white mb-4">Bem-vindo ao Multi Store</h2>
+                    <p className="text-white text-lg mb-6">Escolha um estabelecimento para começar suas compras</p>
                   </div>
                 </div>
               </div>
@@ -150,6 +183,89 @@ export default function Home() {
                 </Card>
               </div>
             </section>
+
+            {/* Establishments Section */}
+            <section>
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-slate-900 mb-2">Nossos Estabelecimentos</h2>
+                <p className="text-slate-600">Escolha um estabelecimento para começar suas compras</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {establishments?.map((establishment) => (
+                  <Card 
+                    key={establishment.id} 
+                    className="hover:shadow-lg transition-shadow cursor-pointer"
+                    onClick={() => handleEstablishmentSelect(establishment)}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-center space-x-4 mb-4">
+                        <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
+                          <Store className="text-white" size={24} />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-slate-900">{establishment.name}</h3>
+                          <p className="text-sm text-slate-600">{establishment.type}</p>
+                        </div>
+                      </div>
+                      <p className="text-slate-600 text-sm mb-4">{establishment.description}</p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2 text-sm text-slate-500">
+                          <MapPin size={16} />
+                          <span>Disponível na região</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-sm text-slate-500">
+                          <Clock size={16} />
+                          <span>Aberto</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </section>
+
+            {/* Offers Section */}
+            <section>
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-slate-900 mb-2">Ofertas Especiais</h2>
+                <p className="text-slate-600">Produtos com descontos especiais em todos os estabelecimentos</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card className="bg-gradient-to-r from-red-500 to-red-600 text-white">
+                  <CardContent className="p-6">
+                    <h3 className="font-bold text-lg mb-2">Até 50% OFF</h3>
+                    <p className="text-sm opacity-90">Em produtos selecionados</p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                  <CardContent className="p-6">
+                    <h3 className="font-bold text-lg mb-2">Frete Grátis</h3>
+                    <p className="text-sm opacity-90">Em compras acima de R$ 50</p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+                  <CardContent className="p-6">
+                    <h3 className="font-bold text-lg mb-2">Cashback</h3>
+                    <p className="text-sm opacity-90">5% de volta em toda compra</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </section>
+          </TabsContent>
+
+          {/* Search Results */}
+          <TabsContent value="search">
+            {selectedEstablishment && searchQuery && (
+              <SearchResults 
+                establishmentId={selectedEstablishment.id}
+                query={searchQuery}
+                onClearSearch={clearSearch}
+              />
+            )}
+          </TabsContent>
+
+          {/* Products Tab */}
+          <TabsContent value="products" className="space-y-12">
 
             {/* Categories Section */}
             <section>
@@ -253,6 +369,22 @@ export default function Home() {
               />
             )}
           </TabsContent>
+
+          {/* Dynamic Category Tabs */}
+          {categories?.map((category) => (
+            <TabsContent key={category.id} value={`category-${category.id}`}>
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-slate-900 mb-2">{category.name}</h2>
+                <p className="text-slate-600">Produtos da categoria {category.name}</p>
+              </div>
+              {selectedEstablishment && (
+                <ProductGrid 
+                  establishmentId={selectedEstablishment.id}
+                  categoryId={category.id}
+                />
+              )}
+            </TabsContent>
+          ))}
 
           <TabsContent value="admin">
             {selectedEstablishment && (

@@ -9,16 +9,18 @@ import { useState } from "react";
 interface HeaderProps {
   selectedEstablishment: any;
   onEstablishmentChange: (establishment: any) => void;
+  onSearch?: (query: string) => void;
 }
 
-export function Header({ selectedEstablishment, onEstablishmentChange }: HeaderProps) {
+export function Header({ selectedEstablishment, onEstablishmentChange, onSearch }: HeaderProps) {
   const { state: cartState, dispatch } = useCart();
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement search functionality
-    console.log("Search query:", searchQuery);
+    if (onSearch && searchQuery.trim()) {
+      onSearch(searchQuery.trim());
+    }
   };
 
   return (

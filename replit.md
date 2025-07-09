@@ -16,6 +16,19 @@ The system is designed for a single owner managing multiple establishments (supe
 Preferred communication style: Simple, everyday language.
 Language: Portuguese (Brazilian)
 
+## Recent Changes (July 2025)
+
+### Enhanced Homepage and User Experience
+- **New Homepage Layout**: Created a welcoming homepage that displays all establishments first, allowing users to choose before shopping
+- **Search Functionality**: Implemented comprehensive product search that filters by name, description, and category
+- **Dynamic Navigation**: Navigation menu now changes based on selected establishment, showing relevant categories as tabs
+- **Improved User Flow**: 
+  1. User starts on homepage with establishment selection
+  2. After choosing establishment, dynamic category tabs appear
+  3. Search functionality works across all products in selected establishment
+  4. Offers section prominently displayed on homepage
+- **Enhanced Search**: Added dedicated search results page with clear filtering and product display
+
 ## System Architecture
 
 ### Frontend Architecture

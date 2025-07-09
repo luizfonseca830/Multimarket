@@ -89,6 +89,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Search products
+  app.get("/api/establishments/:id/products/search", async (req, res) => {
+    try {
+      const establishmentId = parseInt(req.params.id);
+      const query = req.query.q as string;
+      
+      if (!query) {
+        return res.status(400).json({ message: "Query parameter is required" });
+      }
+      
+      const products = await storage.searchProducts(establishmentId, query);
+      res.json(products);
+    } catch (error: any) {
+      res.status(500).json({ message: "Error searching products: " + error.message });
+    }
+  });
+
   app.get("/api/products/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
