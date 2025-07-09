@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { X, CreditCard, QrCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -369,6 +369,22 @@ function CheckoutForm({ onClose, cartItems, total }: Omit<CheckoutModalProps, 'i
 }
 
 export function CheckoutModal({ isOpen, onClose, cartItems, total }: CheckoutModalProps) {
+  const { dispatch } = useCart();
+  const hasClosedCart = useRef(false);
+  
+  // Fechar o carrinho quando o modal de checkout abrir (apenas uma vez)
+  useEffect(() => {
+    if (isOpen && !hasClosedCart.current) {
+      hasClosedCart.current = true;
+      setTimeout(() => {
+        dispatch({ type: "CLOSE_CART" });
+      }, 100);
+    }
+    if (!isOpen) {
+      hasClosedCart.current = false;
+    }
+  }, [isOpen, dispatch]);
+
   if (!isOpen) return null;
 
   return (

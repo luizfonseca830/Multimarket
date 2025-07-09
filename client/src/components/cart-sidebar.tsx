@@ -24,7 +24,7 @@ export function CartSidebar() {
 
   const handleCheckout = () => {
     setShowCheckout(true);
-    dispatch({ type: "CLOSE_CART" });
+    // Não fechar o carrinho imediatamente, deixar aberto para o modal
   };
 
   if (!state.isOpen) return null;
