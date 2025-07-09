@@ -57,15 +57,15 @@ export function ProductGrid({ establishmentId, categoryId, featured = false }: P
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         {Array.from({ length: 8 }).map((_, i) => (
           <Card key={i} className="animate-pulse">
-            <div className="h-48 bg-slate-200 rounded-t-lg" />
-            <CardContent className="p-4">
-              <div className="h-4 bg-slate-200 rounded mb-2" />
-              <div className="h-3 bg-slate-200 rounded w-2/3 mb-3" />
-              <div className="h-4 bg-slate-200 rounded w-1/2 mb-4" />
-              <div className="h-8 bg-slate-200 rounded" />
+            <div className="h-32 sm:h-48 bg-slate-200 rounded-t-lg" />
+            <CardContent className="p-2 sm:p-4">
+              <div className="h-3 sm:h-4 bg-slate-200 rounded mb-1 sm:mb-2" />
+              <div className="h-2 sm:h-3 bg-slate-200 rounded w-2/3 mb-2 sm:mb-3" />
+              <div className="h-3 sm:h-4 bg-slate-200 rounded w-1/2 mb-2 sm:mb-4" />
+              <div className="h-6 sm:h-8 bg-slate-200 rounded" />
             </CardContent>
           </Card>
         ))}
@@ -83,7 +83,7 @@ export function ProductGrid({ establishmentId, categoryId, featured = false }: P
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
       {products.map((product) => {
         const discountPercentage = getDiscountPercentage(product.price, product.originalPrice);
         
@@ -93,62 +93,64 @@ export function ProductGrid({ establishmentId, categoryId, featured = false }: P
               <img 
                 src={product.imageUrl || `https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300`}
                 alt={product.name}
-                className="w-full h-48 object-cover"
+                className="w-full h-32 sm:h-48 object-cover"
               />
               
               {discountPercentage && (
-                <Badge className="absolute top-2 left-2 bg-red-500 text-white">
+                <Badge className="absolute top-1 sm:top-2 left-1 sm:left-2 bg-red-500 text-white text-xs">
                   -{discountPercentage}%
                 </Badge>
               )}
               
               {product.isFeatured && (
-                <Badge className="absolute top-2 left-2 bg-accent text-white">
-                  <Star className="mr-1" size={12} />
-                  Destaque
+                <Badge className="absolute top-1 sm:top-2 left-1 sm:left-2 bg-accent text-white text-xs">
+                  <Star className="mr-1" size={10} />
+                  <span className="hidden sm:inline">Destaque</span>
                 </Badge>
               )}
               
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full shadow-md hover:shadow-lg"
+                className="absolute top-1 sm:top-2 right-1 sm:right-2 w-6 h-6 sm:w-8 sm:h-8 bg-white rounded-full shadow-md hover:shadow-lg"
                 onClick={() => toggleFavorite(product.id)}
               >
                 <Heart 
                   className={favorites.has(product.id) ? "text-red-500 fill-red-500" : "text-slate-400"}
-                  size={16}
+                  size={12}
                 />
               </Button>
             </div>
             
-            <CardContent className="p-4">
-              <h3 className="font-medium text-slate-900 mb-2">{product.name}</h3>
-              <p className="text-slate-500 text-sm mb-3">{product.description}</p>
+            <CardContent className="p-2 sm:p-4">
+              <h3 className="font-medium text-slate-900 mb-1 sm:mb-2 text-sm sm:text-base line-clamp-1">{product.name}</h3>
+              <p className="text-slate-500 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-1 sm:line-clamp-2">{product.description}</p>
               
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-2">
+              <div className="flex items-center justify-between mb-2 sm:mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2">
                   {product.originalPrice && (
-                    <span className="text-slate-400 text-sm line-through">
+                    <span className="text-slate-400 text-xs sm:text-sm line-through">
                       R$ {Number(product.originalPrice).toFixed(2)}
                     </span>
                   )}
-                  <span className="text-lg font-bold text-slate-900">
+                  <span className="text-sm sm:text-lg font-bold text-slate-900">
                     R$ {Number(product.price).toFixed(2)}
                   </span>
                 </div>
-                <Badge variant={product.stock > 0 ? "default" : "destructive"}>
+                <Badge variant={product.stock > 0 ? "default" : "destructive"} className="text-xs">
                   {product.stock > 0 ? "Em estoque" : "Indisponível"}
                 </Badge>
               </div>
               
               <Button
                 onClick={() => handleAddToCart(product)}
-                className="w-full"
+                className="w-full text-xs sm:text-sm"
+                size="sm"
                 disabled={product.stock === 0}
               >
-                <ShoppingCart className="mr-2" size={16} />
-                Adicionar ao Carrinho
+                <ShoppingCart className="mr-1 sm:mr-2" size={12} />
+                <span className="hidden sm:inline">Adicionar ao Carrinho</span>
+                <span className="sm:hidden">Adicionar</span>
               </Button>
             </CardContent>
           </Card>

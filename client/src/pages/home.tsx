@@ -95,38 +95,38 @@ export default function Home() {
 
 
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           {/* Home Page - Show when no establishment is selected */}
-          <TabsContent value="home" className="space-y-12">
+          <TabsContent value="home" className="space-y-8 sm:space-y-12">
             {/* Hero Section */}
-            <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
               <div className="lg:col-span-2">
-                <div className="relative bg-gradient-to-r from-secondary to-emerald-600 rounded-2xl overflow-hidden h-64">
+                <div className="relative bg-gradient-to-r from-secondary to-emerald-600 rounded-2xl overflow-hidden h-48 sm:h-64">
                   <div className="absolute inset-0 bg-black bg-opacity-20"></div>
-                  <div className="relative z-10 p-8 h-full flex flex-col justify-center">
-                    <h2 className="text-3xl font-bold text-white mb-4">Bem-vindo ao Multi Store</h2>
-                    <p className="text-white text-lg mb-6">Escolha um estabelecimento para começar suas compras</p>
+                  <div className="relative z-10 p-4 sm:p-8 h-full flex flex-col justify-center">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 sm:mb-4">Bem-vindo ao Multi Store</h2>
+                    <p className="text-white text-sm sm:text-lg mb-4 sm:mb-6">Escolha um estabelecimento para começar suas compras</p>
                   </div>
                 </div>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-semibold text-slate-900">Entrega Rápida</h3>
-                      <Truck className="text-primary" size={24} />
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="flex items-center justify-between mb-3 sm:mb-4">
+                      <h3 className="font-semibold text-slate-900 text-sm sm:text-base">Entrega Rápida</h3>
+                      <Truck className="text-primary" size={20} />
                     </div>
-                    <p className="text-slate-600 text-sm">Entrega em até 2 horas para sua região</p>
+                    <p className="text-slate-600 text-xs sm:text-sm">Entrega em até 2 horas para sua região</p>
                   </CardContent>
                 </Card>
                 <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-semibold text-slate-900">Pagamento Seguro</h3>
-                      <Shield className="text-secondary" size={24} />
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="flex items-center justify-between mb-3 sm:mb-4">
+                      <h3 className="font-semibold text-slate-900 text-sm sm:text-base">Pagamento Seguro</h3>
+                      <Shield className="text-secondary" size={20} />
                     </div>
-                    <p className="text-slate-600 text-sm">PIX, cartão de crédito e débito</p>
+                    <p className="text-slate-600 text-xs sm:text-sm">PIX, cartão de crédito e débito</p>
                   </CardContent>
                 </Card>
               </div>
@@ -134,35 +134,35 @@ export default function Home() {
 
             {/* Establishments Section */}
             <section>
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-slate-900 mb-2">Nossos Estabelecimentos</h2>
-                <p className="text-slate-600">Escolha um estabelecimento para começar suas compras</p>
+              <div className="mb-4 sm:mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-1 sm:mb-2">Nossos Estabelecimentos</h2>
+                <p className="text-slate-600 text-sm sm:text-base">Escolha um estabelecimento para começar suas compras</p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {establishments?.map((establishment) => (
                   <Card 
                     key={establishment.id} 
                     className="hover:shadow-lg transition-shadow cursor-pointer"
                     onClick={() => handleEstablishmentSelect(establishment)}
                   >
-                    <CardContent className="p-6">
-                      <div className="flex items-center space-x-4 mb-4">
-                        <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
-                          <Store className="text-white" size={24} />
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex items-center space-x-3 sm:space-x-4 mb-3 sm:mb-4">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                          <Store className="text-white" size={20} />
                         </div>
-                        <div>
-                          <h3 className="font-semibold text-slate-900">{establishment.name}</h3>
-                          <p className="text-sm text-slate-600">{establishment.type}</p>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-semibold text-slate-900 text-sm sm:text-base truncate">{establishment.name}</h3>
+                          <p className="text-xs sm:text-sm text-slate-600">{establishment.type}</p>
                         </div>
                       </div>
-                      <p className="text-slate-600 text-sm mb-4">{establishment.description}</p>
+                      <p className="text-slate-600 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">{establishment.description}</p>
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2 text-sm text-slate-500">
-                          <MapPin size={16} />
+                        <div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-slate-500">
+                          <MapPin size={14} />
                           <span>Disponível na região</span>
                         </div>
-                        <div className="flex items-center space-x-2 text-sm text-slate-500">
-                          <Clock size={16} />
+                        <div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-slate-500">
+                          <Clock size={14} />
                           <span>Aberto</span>
                         </div>
                       </div>
@@ -174,27 +174,27 @@ export default function Home() {
 
             {/* Offers Section */}
             <section>
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-slate-900 mb-2">Ofertas Especiais</h2>
-                <p className="text-slate-600">Produtos com descontos especiais em todos os estabelecimentos</p>
+              <div className="mb-4 sm:mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-1 sm:mb-2">Ofertas Especiais</h2>
+                <p className="text-slate-600 text-sm sm:text-base">Produtos com descontos especiais em todos os estabelecimentos</p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 <Card className="bg-gradient-to-r from-red-500 to-red-600 text-white">
-                  <CardContent className="p-6">
-                    <h3 className="font-bold text-lg mb-2">Até 50% OFF</h3>
-                    <p className="text-sm opacity-90">Em produtos selecionados</p>
+                  <CardContent className="p-4 sm:p-6">
+                    <h3 className="font-bold text-base sm:text-lg mb-1 sm:mb-2">Até 50% OFF</h3>
+                    <p className="text-xs sm:text-sm opacity-90">Em produtos selecionados</p>
                   </CardContent>
                 </Card>
                 <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-                  <CardContent className="p-6">
-                    <h3 className="font-bold text-lg mb-2">Frete Grátis</h3>
-                    <p className="text-sm opacity-90">Em compras acima de R$ 50</p>
+                  <CardContent className="p-4 sm:p-6">
+                    <h3 className="font-bold text-base sm:text-lg mb-1 sm:mb-2">Frete Grátis</h3>
+                    <p className="text-xs sm:text-sm opacity-90">Em compras acima de R$ 50</p>
                   </CardContent>
                 </Card>
                 <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
-                  <CardContent className="p-6">
-                    <h3 className="font-bold text-lg mb-2">Cashback</h3>
-                    <p className="text-sm opacity-90">5% de volta em toda compra</p>
+                  <CardContent className="p-4 sm:p-6">
+                    <h3 className="font-bold text-base sm:text-lg mb-1 sm:mb-2">Cashback</h3>
+                    <p className="text-xs sm:text-sm opacity-90">5% de volta em toda compra</p>
                   </CardContent>
                 </Card>
               </div>
