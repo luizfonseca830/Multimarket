@@ -18,12 +18,13 @@ Idioma: Português (Brasileiro)
 
 ## Mudanças Recentes (Janeiro 2025)
 
-### Identidade Visual CARNES ANGELIN e Melhorias (Atual - Janeiro 2025)
-- **Nova Identidade Visual**: Aplicada a marca "CARNES ANGELIN" em todo o sistema
-  - Esquema de cores baseado na logo: terracota/laranja e dourado/bege
-  - Ícone personalizado de touro em SVG substituindo ícones genéricos
+### Identidade Visual GRUPO ANGELIN e Melhorias (Atual - Janeiro 2025)
+- **Nova Identidade Visual**: Aplicada a marca "GRUPO ANGELIN" em todo o sistema
+  - Esquema de cores baseado na logo: dourado/âmbar e preto
+  - Ícone personalizado do grupo em SVG no header e estabelecimentos gerais
+  - Ícone de touro exclusivo para estabelecimentos do tipo açougue
   - Gradientes elegantes nos cards e botões
-  - Tipografia e cores que refletem a marca do açougue premium
+  - Tipografia e cores que refletem a identidade da rede de estabelecimentos
 - **Corrigido Fluxo do Modal de Checkout**: Resolvido problema onde o modal de checkout não abria adequadamente
 - **Experiência do Usuário Melhorada**: 
   - Modal agora abre sobre o carrinho sem fechá-lo
