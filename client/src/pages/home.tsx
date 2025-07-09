@@ -73,12 +73,12 @@ export default function Home() {
         ) : (
           <div className="space-y-8">
             {/* Hero Section */}
-            <div className="text-center space-y-4">
-              <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">
-                Bem-vindo ao Multi Store
+            <div className="text-center space-y-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg p-8">
+              <h1 className="text-3xl sm:text-4xl font-bold text-orange-800">
+                Bem-vindo ao CARNES ANGELIN
               </h1>
-              <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                Explore nossos estabelecimentos e encontre os melhores produtos
+              <p className="text-lg text-orange-700 max-w-2xl mx-auto">
+                Açougue Premium - Carnes selecionadas e produtos de qualidade
               </p>
             </div>
 
@@ -113,14 +113,16 @@ export default function Home() {
                     >
                       <CardHeader className="pb-3">
                         <div className="flex items-center space-x-3">
-                          <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center group-hover:bg-primary/90 transition-colors">
-                            <Store className="text-white" size={24} />
+                          <div className="w-12 h-12 bg-gradient-to-br from-orange-600 to-orange-700 rounded-full flex items-center justify-center group-hover:from-orange-700 group-hover:to-orange-800 transition-all duration-200 shadow-lg">
+                            <svg viewBox="0 0 100 100" className="w-6 h-6 fill-yellow-100">
+                              <path d="M50 25 C35 25, 25 35, 25 50 C25 55, 27 60, 30 64 L35 58 C33 55, 32 52, 32 50 C32 40, 40 32, 50 32 C60 32, 68 40, 68 50 C68 52, 67 55, 65 58 L70 64 C73 60, 75 55, 75 50 C75 35, 65 25, 50 25 Z M20 45 C15 40, 12 35, 15 30 C18 25, 25 27, 30 32 M80 45 C85 40, 88 35, 85 30 C82 25, 75 27, 70 32"/>
+                            </svg>
                           </div>
                           <div className="flex-1">
-                            <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                            <CardTitle className="text-lg group-hover:text-orange-700 transition-colors">
                               {establishment.name}
                             </CardTitle>
-                            <Badge variant="secondary" className="mt-1 text-xs">
+                            <Badge variant="secondary" className="mt-1 text-xs bg-orange-100 text-orange-800">
                               {establishment.type}
                             </Badge>
                           </div>
@@ -145,26 +147,28 @@ export default function Home() {
               </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                <Card className="bg-gradient-to-r from-primary to-primary/80 text-white">
+                <Card className="bg-gradient-to-r from-orange-600 to-orange-700 text-white">
                   <CardContent className="p-6">
                     <div className="flex items-center space-x-3 mb-4">
                       <ShoppingCart className="text-white" size={24} />
                       <h3 className="text-lg font-semibold">Entrega Rápida</h3>
                     </div>
                     <p className="text-white/90">
-                      Receba seus produtos em casa rapidamente
+                      Receba suas carnes frescas em casa rapidamente
                     </p>
                   </CardContent>
                 </Card>
                 
-                <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+                <Card className="bg-gradient-to-r from-amber-600 to-yellow-600 text-white">
                   <CardContent className="p-6">
                     <div className="flex items-center space-x-3 mb-4">
-                      <Store className="text-white" size={24} />
-                      <h3 className="text-lg font-semibold">Múltiplas Lojas</h3>
+                      <svg viewBox="0 0 100 100" className="w-6 h-6 fill-white">
+                        <path d="M50 25 C35 25, 25 35, 25 50 C25 55, 27 60, 30 64 L35 58 C33 55, 32 52, 32 50 C32 40, 40 32, 50 32 C60 32, 68 40, 68 50 C68 52, 67 55, 65 58 L70 64 C73 60, 75 55, 75 50 C75 35, 65 25, 50 25 Z M20 45 C15 40, 12 35, 15 30 C18 25, 25 27, 30 32 M80 45 C85 40, 88 35, 85 30 C82 25, 75 27, 70 32"/>
+                      </svg>
+                      <h3 className="text-lg font-semibold">Carnes Premium</h3>
                     </div>
                     <p className="text-white/90">
-                      Diferentes tipos de estabelecimentos
+                      Seleção especial de carnes de alta qualidade
                     </p>
                   </CardContent>
                 </Card>
