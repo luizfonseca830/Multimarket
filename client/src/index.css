@@ -73,3 +73,66 @@
     overflow: hidden;
   }
 }
+
+/* Otimizações para Galaxy S23 Ultra (428x915px) */
+@media (max-width: 428px) and (orientation: portrait) {
+  .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  
+  .mobile-search {
+    font-size: 16px; /* Previne zoom no Safari */
+  }
+  
+  .mobile-card {
+    padding: 12px;
+  }
+  
+  .mobile-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .mobile-text {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  
+  .mobile-button {
+    min-height: 44px; /* Tamanho mínimo para touch */
+  }
+}
+
+/* Otimizações para Galaxy S23 Ultra em landscape */
+@media (max-width: 915px) and (orientation: landscape) {
+  .landscape-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  
+  .landscape-search {
+    width: 100%;
+    max-width: 600px;
+  }
+}
+
+/* Melhorias gerais de responsividade */
+@media (max-width: 640px) {
+  .responsive-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .responsive-padding {
+    padding: 16px;
+  }
+  
+  .responsive-text {
+    font-size: 14px;
+  }
+  
+  .responsive-header {
+    padding: 8px 12px;
+  }
+}

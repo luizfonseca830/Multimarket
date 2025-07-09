@@ -18,6 +18,18 @@ Language: Portuguese (Brazilian)
 
 ## Recent Changes (July 2025)
 
+### Complete Global Search System (Current)
+- **Unified Search Experience**: Removed establishment selection, implemented comprehensive global search
+- **Global Search Component**: Created unified search that simultaneously searches establishments, products, and categories
+- **Simplified Homepage**: Clean homepage with hero section, global search, and featured highlights
+- **Enhanced User Flow**:
+  1. User starts on homepage with global search
+  2. Search queries all establishments, products, and categories simultaneously
+  3. Results displayed in organized tabs (All, Establishments, Products, Categories)
+  4. Direct navigation to selected items from search results
+- **Mobile Optimization**: Added specific CSS optimizations for Galaxy S23 Ultra (428x915px)
+- **Responsive Design**: Enhanced responsiveness with mobile-first approach
+
 ### Enhanced Homepage and User Experience
 - **New Homepage Layout**: Created a welcoming homepage that displays all establishments first, allowing users to choose before shopping
 - **Search Functionality**: Implemented comprehensive product search that filters by name, description, and category
