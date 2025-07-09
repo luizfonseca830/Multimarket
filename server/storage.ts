@@ -5,6 +5,7 @@ import {
   orders, 
   orderItems, 
   offers,
+  adminUsers,
   type Establishment,
   type InsertEstablishment,
   type Category,
@@ -19,6 +20,7 @@ import {
   type OrderWithItems,
   type Offer,
   type InsertOffer,
+  type AdminUser,
   type CategoryWithProducts
 } from "@shared/schema";
 import { db } from "./db";
@@ -58,6 +60,9 @@ export interface IStorage {
   getOffersByEstablishment(establishmentId: number): Promise<Offer[]>;
   getActiveOffers(establishmentId: number): Promise<Offer[]>;
   createOffer(offer: InsertOffer): Promise<Offer>;
+  
+  // Admin Authentication
+  authenticateAdmin(username: string, password: string): Promise<AdminUser | null>;
   
   // Dashboard Stats
   getDashboardStats(establishmentId: number): Promise<{
@@ -341,6 +346,20 @@ export class DatabaseStorage implements IStorage {
   async createOffer(offer: InsertOffer): Promise<Offer> {
     const [newOffer] = await db.insert(offers).values(offer).returning();
     return newOffer;
+  }
+
+  // Admin Authentication
+  async authenticateAdmin(username: string, password: string): Promise<AdminUser | null> {
+    const [admin] = await db
+      .select()
+      .from(adminUsers)
+      .where(and(
+        eq(adminUsers.username, username),
+        eq(adminUsers.password, password),
+        eq(adminUsers.isActive, true)
+      ));
+    
+    return admin || null;
   }
 
   // Dashboard Stats

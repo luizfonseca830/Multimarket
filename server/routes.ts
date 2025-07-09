@@ -4,6 +4,7 @@ import Stripe from "stripe";
 import { storage } from "./storage";
 import { insertOrderSchema, insertOrderItemSchema } from "@shared/schema";
 import { z } from "zod";
+import crypto from 'crypto';
 
 // Use test key if no Stripe secret is provided
 const stripeKey = process.env.STRIPE_SECRET_KEY || 'sk_test_51234567890';
@@ -246,6 +247,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(updatedOrder);
     } catch (error: any) {
       res.status(400).json({ message: "Error updating payment status: " + error.message });
+    }
+  });
+
+  // Admin authentication
+  app.post("/api/admin/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({ message: "Username and password are required" });
+      }
+      
+      const admin = await storage.authenticateAdmin(username, password);
+      
+      if (admin) {
+        // Generate a simple token (in production, use proper JWT)
+        const token = crypto.randomBytes(32).toString('hex');
+        res.json({ 
+          success: true, 
+          token,
+          admin: { id: admin.id, username: admin.username }
+        });
+      } else {
+        res.status(401).json({ 
+          success: false, 
+          message: "Invalid credentials" 
+        });
+      }
+    } catch (error: any) {
+      res.status(500).json({ message: "Error during authentication: " + error.message });
     }
   });
 

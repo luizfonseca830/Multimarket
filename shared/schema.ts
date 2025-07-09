@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, decimal, timestamp, uuid, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, decimal, timestamp, uuid, jsonb, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
@@ -78,6 +78,15 @@ export const offers = pgTable("offers", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Admin users table
+export const adminUsers = pgTable("admin_users", {
+  id: serial("id").primaryKey(),
+  username: varchar("username", { length: 50 }).notNull().unique(),
+  password: varchar("password", { length: 255 }).notNull(),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Relations
 export const establishmentsRelations = relations(establishments, ({ many }) => ({
   categories: many(categories),
@@ -144,6 +153,7 @@ export const insertProductSchema = createInsertSchema(products).omit({ id: true,
 export const insertOrderSchema = createInsertSchema(orders).omit({ id: true, createdAt: true });
 export const insertOrderItemSchema = createInsertSchema(orderItems).omit({ id: true });
 export const insertOfferSchema = createInsertSchema(offers).omit({ id: true, createdAt: true });
+export const insertAdminUserSchema = createInsertSchema(adminUsers).omit({ id: true, createdAt: true, isActive: true });
 
 // Types
 export type Establishment = typeof establishments.$inferSelect;
@@ -158,6 +168,8 @@ export type OrderItem = typeof orderItems.$inferSelect;
 export type InsertOrderItem = z.infer<typeof insertOrderItemSchema>;
 export type Offer = typeof offers.$inferSelect;
 export type InsertOffer = z.infer<typeof insertOfferSchema>;
+export type AdminUser = typeof adminUsers.$inferSelect;
+export type InsertAdminUser = z.infer<typeof insertAdminUserSchema>;
 
 // Additional types for API responses
 export type ProductWithCategory = Product & { category: Category };

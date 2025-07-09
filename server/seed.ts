@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { establishments, categories, products, offers } from "@shared/schema";
+import { establishments, categories, products, offers, adminUsers } from "@shared/schema";
 
 async function seed() {
   console.log("Seeding database...");
@@ -9,6 +9,7 @@ async function seed() {
   await db.delete(products);
   await db.delete(categories);
   await db.delete(establishments);
+  await db.delete(adminUsers);
 
   // Create establishments
   const [supermarket] = await db.insert(establishments).values({
@@ -261,6 +262,13 @@ async function seed() {
     establishmentId: supermarket.id,
     isActive: true,
     validUntil: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
+  });
+
+  // Create admin user
+  await db.insert(adminUsers).values({
+    username: "admin",
+    password: "admin", // Note: In production, this should be hashed
+    isActive: true,
   });
 
   console.log("Database seeded successfully!");

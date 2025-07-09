@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, User, Store } from "lucide-react";
+import { Search, ShoppingCart, User, Store, Shield, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/lib/cart-context";
@@ -38,6 +38,14 @@ export function Header({ selectedEstablishment, onEstablishmentChange, onSearch 
               <h1 className="text-xl font-bold text-slate-900">Multi Store</h1>
               <p className="text-xs text-slate-500">Rede de Estabelecimentos</p>
             </div>
+            <Button 
+              variant="ghost" 
+              className="ml-4 flex items-center space-x-2"
+              onClick={() => window.location.href = "/"}
+            >
+              <Home size={16} />
+              <span className="text-sm">Home</span>
+            </Button>
           </div>
 
           {/* Center Section */}
@@ -74,6 +82,16 @@ export function Header({ selectedEstablishment, onEstablishmentChange, onSearch 
                   {cartState.items.reduce((sum, item) => sum + item.quantity, 0)}
                 </Badge>
               )}
+            </Button>
+
+            {/* Admin Button */}
+            <Button 
+              variant="outline" 
+              className="flex items-center space-x-2"
+              onClick={() => window.location.href = "/admin"}
+            >
+              <Shield size={16} />
+              <span className="hidden sm:inline text-sm">Admin</span>
             </Button>
 
             {/* User Menu */}
