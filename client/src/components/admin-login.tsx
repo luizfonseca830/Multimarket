@@ -34,6 +34,7 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
         });
         // Chamar onLoginSuccess após o toast
         setTimeout(() => {
+          console.log("Calling onLoginSuccess callback");
           onLoginSuccess();
         }, 500);
       } else {

@@ -18,6 +18,7 @@ export default function AdminPage() {
   }, []);
 
   const handleLoginSuccess = () => {
+    console.log("Login success callback called");
     setIsAuthenticated(true);
   };
 
