@@ -88,6 +88,18 @@ export const adminUsers = pgTable("admin_users", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Product sales tracking table
+export const productSales = pgTable("product_sales", {
+  id: serial("id").primaryKey(),
+  productId: integer("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  establishmentId: integer("establishment_id").notNull().references(() => establishments.id, { onDelete: "cascade" }),
+  quantitySold: integer("quantity_sold").notNull().default(0),
+  totalRevenue: decimal("total_revenue", { precision: 10, scale: 2 }).notNull().default("0.00"),
+  lastSaleDate: timestamp("last_sale_date").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Relations
 export const establishmentsRelations = relations(establishments, ({ many }) => ({
   categories: many(categories),
@@ -115,6 +127,18 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   }),
   orderItems: many(orderItems),
   offers: many(offers),
+  sales: many(productSales),
+}));
+
+export const productSalesRelations = relations(productSales, ({ one }) => ({
+  product: one(products, {
+    fields: [productSales.productId],
+    references: [products.id],
+  }),
+  establishment: one(establishments, {
+    fields: [productSales.establishmentId],
+    references: [establishments.id],
+  }),
 }));
 
 export const ordersRelations = relations(orders, ({ one, many }) => ({
@@ -155,6 +179,7 @@ export const insertOrderSchema = createInsertSchema(orders).omit({ id: true, cre
 export const insertOrderItemSchema = createInsertSchema(orderItems).omit({ id: true });
 export const insertOfferSchema = createInsertSchema(offers).omit({ id: true, createdAt: true });
 export const insertAdminUserSchema = createInsertSchema(adminUsers).omit({ id: true, createdAt: true, isActive: true });
+export const insertProductSalesSchema = createInsertSchema(productSales).omit({ id: true, createdAt: true, updatedAt: true });
 
 // Types
 export type Establishment = typeof establishments.$inferSelect;
@@ -171,6 +196,8 @@ export type Offer = typeof offers.$inferSelect;
 export type InsertOffer = z.infer<typeof insertOfferSchema>;
 export type AdminUser = typeof adminUsers.$inferSelect;
 export type InsertAdminUser = z.infer<typeof insertAdminUserSchema>;
+export type ProductSales = typeof productSales.$inferSelect;
+export type InsertProductSales = z.infer<typeof insertProductSalesSchema>;
 
 // Additional types for API responses
 export type ProductWithCategory = Product & { category: Category };

@@ -63,7 +63,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/establishments/:id/products", async (req, res) => {
     try {
       const establishmentId = parseInt(req.params.id);
-      const products = await storage.getProductsByEstablishment(establishmentId);
+      const sortBy = req.query.sortBy as string;
+      const products = await storage.getProductsByEstablishment(establishmentId, sortBy);
       res.json(products);
     } catch (error: any) {
       res.status(500).json({ message: "Error fetching products: " + error.message });

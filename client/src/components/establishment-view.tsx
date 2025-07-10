@@ -14,6 +14,7 @@ interface EstablishmentViewProps {
 
 export function EstablishmentView({ establishment, onBack }: EstablishmentViewProps) {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [sortBy, setSortBy] = useState<string>('best_sellers');
   const { dispatch } = useCart();
 
   const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({
@@ -21,7 +22,14 @@ export function EstablishmentView({ establishment, onBack }: EstablishmentViewPr
   });
 
   const { data: products, isLoading: productsLoading } = useQuery<ProductWithCategory[]>({
-    queryKey: ['/api/establishments', establishment.id, 'products'],
+    queryKey: ['/api/establishments', establishment.id, 'products', sortBy],
+    queryFn: async () => {
+      const response = await fetch(`/api/establishments/${establishment.id}/products?sortBy=${sortBy}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+      return response.json();
+    },
   });
 
   const filteredProducts = selectedCategory 
@@ -145,54 +153,132 @@ export function EstablishmentView({ establishment, onBack }: EstablishmentViewPr
         <h2 className="text-xl font-semibold text-slate-900">ORDENAR</h2>
         
         <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
-          <button className="flex flex-col items-center p-4 border-2 border-slate-200 rounded-lg hover:border-orange-500 transition-colors">
-            <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center mb-2">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 text-slate-600">
+          <button 
+            onClick={() => setSortBy('price_desc')}
+            className={`flex flex-col items-center p-4 border-2 rounded-lg transition-colors ${
+              sortBy === 'price_desc' 
+                ? 'border-orange-500 bg-orange-50' 
+                : 'border-slate-200 hover:border-orange-500'
+            }`}
+          >
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${
+              sortBy === 'price_desc' ? 'bg-orange-100' : 'bg-slate-100'
+            }`}>
+              <svg viewBox="0 0 24 24" className={`w-5 h-5 ${
+                sortBy === 'price_desc' ? 'text-orange-600' : 'text-slate-600'
+              }`}>
                 <path fill="currentColor" d="M7 14l5-5 5 5z"/>
               </svg>
             </div>
-            <span className="text-xs font-medium text-slate-700 text-center">MAIOR PREÇO</span>
+            <span className={`text-xs font-medium text-center ${
+              sortBy === 'price_desc' ? 'text-orange-700' : 'text-slate-700'
+            }`}>MAIOR PREÇO</span>
           </button>
           
-          <button className="flex flex-col items-center p-4 border-2 border-slate-200 rounded-lg hover:border-orange-500 transition-colors">
-            <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center mb-2">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 text-slate-600">
+          <button 
+            onClick={() => setSortBy('price_asc')}
+            className={`flex flex-col items-center p-4 border-2 rounded-lg transition-colors ${
+              sortBy === 'price_asc' 
+                ? 'border-orange-500 bg-orange-50' 
+                : 'border-slate-200 hover:border-orange-500'
+            }`}
+          >
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${
+              sortBy === 'price_asc' ? 'bg-orange-100' : 'bg-slate-100'
+            }`}>
+              <svg viewBox="0 0 24 24" className={`w-5 h-5 ${
+                sortBy === 'price_asc' ? 'text-orange-600' : 'text-slate-600'
+              }`}>
                 <path fill="currentColor" d="M7 10l5 5 5-5z"/>
               </svg>
             </div>
-            <span className="text-xs font-medium text-slate-700 text-center">MENOR PREÇO</span>
+            <span className={`text-xs font-medium text-center ${
+              sortBy === 'price_asc' ? 'text-orange-700' : 'text-slate-700'
+            }`}>MENOR PREÇO</span>
           </button>
           
-          <button className="flex flex-col items-center p-4 border-2 border-orange-500 bg-orange-50 rounded-lg">
-            <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mb-2">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 text-orange-600">
+          <button 
+            onClick={() => setSortBy('best_sellers')}
+            className={`flex flex-col items-center p-4 border-2 rounded-lg transition-colors ${
+              sortBy === 'best_sellers' 
+                ? 'border-orange-500 bg-orange-50' 
+                : 'border-slate-200 hover:border-orange-500'
+            }`}
+          >
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${
+              sortBy === 'best_sellers' ? 'bg-orange-100' : 'bg-slate-100'
+            }`}>
+              <svg viewBox="0 0 24 24" className={`w-5 h-5 ${
+                sortBy === 'best_sellers' ? 'text-orange-600' : 'text-slate-600'
+              }`}>
                 <path fill="currentColor" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
               </svg>
             </div>
-            <span className="text-xs font-medium text-orange-700 text-center">MAIS VENDIDOS</span>
+            <span className={`text-xs font-medium text-center ${
+              sortBy === 'best_sellers' ? 'text-orange-700' : 'text-slate-700'
+            }`}>MAIS VENDIDOS</span>
           </button>
           
-          <button className="flex flex-col items-center p-4 border-2 border-slate-200 rounded-lg hover:border-orange-500 transition-colors">
-            <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center mb-2">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 text-slate-600">
+          <button 
+            onClick={() => setSortBy('discount')}
+            className={`flex flex-col items-center p-4 border-2 rounded-lg transition-colors ${
+              sortBy === 'discount' 
+                ? 'border-orange-500 bg-orange-50' 
+                : 'border-slate-200 hover:border-orange-500'
+            }`}
+          >
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${
+              sortBy === 'discount' ? 'bg-orange-100' : 'bg-slate-100'
+            }`}>
+              <svg viewBox="0 0 24 24" className={`w-5 h-5 ${
+                sortBy === 'discount' ? 'text-orange-600' : 'text-slate-600'
+              }`}>
                 <path fill="currentColor" d="M9 3v2H5v14h4v2H3V3h6zm12 0v18h-8v-2h6V5h-6V3h8z"/>
               </svg>
             </div>
-            <span className="text-xs font-medium text-slate-700 text-center">MAIOR DESCONTO</span>
+            <span className={`text-xs font-medium text-center ${
+              sortBy === 'discount' ? 'text-orange-700' : 'text-slate-700'
+            }`}>MAIOR DESCONTO</span>
           </button>
           
-          <button className="flex flex-col items-center p-4 border-2 border-slate-200 rounded-lg hover:border-orange-500 transition-colors">
-            <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center mb-2">
-              <span className="text-xs font-bold text-slate-600">A-Z</span>
+          <button 
+            onClick={() => setSortBy('name_asc')}
+            className={`flex flex-col items-center p-4 border-2 rounded-lg transition-colors ${
+              sortBy === 'name_asc' 
+                ? 'border-orange-500 bg-orange-50' 
+                : 'border-slate-200 hover:border-orange-500'
+            }`}
+          >
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${
+              sortBy === 'name_asc' ? 'bg-orange-100' : 'bg-slate-100'
+            }`}>
+              <span className={`text-xs font-bold ${
+                sortBy === 'name_asc' ? 'text-orange-600' : 'text-slate-600'
+              }`}>A-Z</span>
             </div>
-            <span className="text-xs font-medium text-slate-700 text-center">DE A A Z</span>
+            <span className={`text-xs font-medium text-center ${
+              sortBy === 'name_asc' ? 'text-orange-700' : 'text-slate-700'
+            }`}>DE A A Z</span>
           </button>
           
-          <button className="flex flex-col items-center p-4 border-2 border-slate-200 rounded-lg hover:border-orange-500 transition-colors">
-            <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center mb-2">
-              <span className="text-xs font-bold text-slate-600">Z-A</span>
+          <button 
+            onClick={() => setSortBy('name_desc')}
+            className={`flex flex-col items-center p-4 border-2 rounded-lg transition-colors ${
+              sortBy === 'name_desc' 
+                ? 'border-orange-500 bg-orange-50' 
+                : 'border-slate-200 hover:border-orange-500'
+            }`}
+          >
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${
+              sortBy === 'name_desc' ? 'bg-orange-100' : 'bg-slate-100'
+            }`}>
+              <span className={`text-xs font-bold ${
+                sortBy === 'name_desc' ? 'text-orange-600' : 'text-slate-600'
+              }`}>Z-A</span>
             </div>
-            <span className="text-xs font-medium text-slate-700 text-center">DE Z A A</span>
+            <span className={`text-xs font-medium text-center ${
+              sortBy === 'name_desc' ? 'text-orange-700' : 'text-slate-700'
+            }`}>DE Z A A</span>
           </button>
         </div>
       </div>

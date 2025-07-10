@@ -6,6 +6,7 @@ import {
   orderItems, 
   offers,
   adminUsers,
+  productSales,
   type Establishment,
   type InsertEstablishment,
   type Category,
@@ -24,7 +25,7 @@ import {
   type CategoryWithProducts
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, sql, or, ilike } from "drizzle-orm";
+import { eq, and, desc, asc, sql, or, ilike } from "drizzle-orm";
 
 export interface IStorage {
   // Establishments
@@ -38,7 +39,7 @@ export interface IStorage {
   createCategory(category: InsertCategory): Promise<Category>;
   
   // Products
-  getProductsByEstablishment(establishmentId: number): Promise<ProductWithCategory[]>;
+  getProductsByEstablishment(establishmentId: number, sortBy?: string): Promise<ProductWithCategory[]>;
   getProductsByCategory(categoryId: number): Promise<ProductWithCategory[]>;
   getFeaturedProducts(establishmentId: number): Promise<ProductWithCategory[]>;
   getProduct(id: number): Promise<ProductWithCategory | undefined>;
@@ -123,8 +124,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Products
-  async getProductsByEstablishment(establishmentId: number): Promise<ProductWithCategory[]> {
-    return await db.select({
+  async getProductsByEstablishment(establishmentId: number, sortBy?: string): Promise<ProductWithCategory[]> {
+    let query = db.select({
       id: products.id,
       name: products.name,
       description: products.description,
@@ -142,8 +143,47 @@ export class DatabaseStorage implements IStorage {
     })
     .from(products)
     .innerJoin(categories, eq(products.categoryId, categories.id))
-    .where(and(eq(products.establishmentId, establishmentId), eq(products.isActive, true)))
-    .orderBy(desc(products.createdAt));
+    .where(and(eq(products.establishmentId, establishmentId), eq(products.isActive, true)));
+
+    // Add sorting based on sortBy parameter
+    switch (sortBy) {
+      case 'price_asc':
+        return await query.orderBy(asc(products.price));
+      case 'price_desc':
+        return await query.orderBy(desc(products.price));
+      case 'name_asc':
+        return await query.orderBy(asc(products.name));
+      case 'name_desc':
+        return await query.orderBy(desc(products.name));
+      case 'best_sellers':
+        // Join with productSales and order by quantity sold
+        return await db.select({
+          id: products.id,
+          name: products.name,
+          description: products.description,
+          price: products.price,
+          originalPrice: products.originalPrice,
+          unit: products.unit,
+          stock: products.stock,
+          imageUrl: products.imageUrl,
+          isActive: products.isActive,
+          isFeatured: products.isFeatured,
+          categoryId: products.categoryId,
+          establishmentId: products.establishmentId,
+          createdAt: products.createdAt,
+          category: categories
+        })
+        .from(products)
+        .innerJoin(categories, eq(products.categoryId, categories.id))
+        .leftJoin(productSales, eq(products.id, productSales.productId))
+        .where(and(eq(products.establishmentId, establishmentId), eq(products.isActive, true)))
+        .orderBy(desc(sql`COALESCE(${productSales.quantitySold}, 0)`));
+      case 'discount':
+        // Order by discount percentage (original price vs current price)
+        return await query.orderBy(desc(sql`CASE WHEN ${products.originalPrice} IS NOT NULL THEN (${products.originalPrice} - ${products.price}) / ${products.originalPrice} * 100 ELSE 0 END`));
+      default:
+        return await query.orderBy(desc(products.createdAt));
+    }
   }
 
   async getProductsByCategory(categoryId: number): Promise<ProductWithCategory[]> {
@@ -373,7 +413,53 @@ export class DatabaseStorage implements IStorage {
   // Order Items
   async createOrderItem(orderItem: InsertOrderItem): Promise<OrderItem> {
     const [newOrderItem] = await db.insert(orderItems).values(orderItem).returning();
+    
+    // Update product sales data
+    await this.updateProductSales(orderItem.productId, orderItem.quantity, parseFloat(orderItem.price));
+    
     return newOrderItem;
+  }
+
+  async updateProductSales(productId: number, quantity: number, unitPrice: number): Promise<void> {
+    const totalRevenue = quantity * unitPrice;
+    
+    // Check if product sales record exists
+    const [existingSales] = await db
+      .select()
+      .from(productSales)
+      .where(eq(productSales.productId, productId));
+
+    if (existingSales) {
+      // Update existing record
+      await db
+        .update(productSales)
+        .set({
+          quantitySold: existingSales.quantitySold + quantity,
+          totalRevenue: (parseFloat(existingSales.totalRevenue) + totalRevenue).toFixed(2),
+          lastSaleDate: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(productSales.productId, productId));
+    } else {
+      // Get product to find establishment ID
+      const [product] = await db
+        .select()
+        .from(products)
+        .where(eq(products.id, productId));
+
+      if (product) {
+        // Create new sales record
+        await db
+          .insert(productSales)
+          .values({
+            productId,
+            establishmentId: product.establishmentId,
+            quantitySold: quantity,
+            totalRevenue: totalRevenue.toFixed(2),
+            lastSaleDate: new Date(),
+          });
+      }
+    }
   }
 
   // Offers
