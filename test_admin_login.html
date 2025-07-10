@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste Admin Login</title>
+</head>
+<body>
+    <h1>Testando Login Admin</h1>
+    <button onclick="testLogin()">Fazer Login Admin</button>
+    <div id="result"></div>
+    
+    <script>
+    async function testLogin() {
+        try {
+            const response = await fetch('/api/admin/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: 'admin',
+                    password: 'admin'
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                localStorage.setItem('admin-token', data.token);
+                document.getElementById('result').innerHTML = '<p style="color: green;">Login realizado com sucesso! Token salvo.</p>';
+                // Redirecionar para admin
+                setTimeout(() => {
+                    window.location.href = '/admin';
+                }, 1000);
+            } else {
+                document.getElementById('result').innerHTML = '<p style="color: red;">Erro: ' + data.message + '</p>';
+            }
+        } catch (error) {
+            document.getElementById('result').innerHTML = '<p style="color: red;">Erro de conexão: ' + error.message + '</p>';
+        }
+    }
+    </script>
+</body>
+</html>
