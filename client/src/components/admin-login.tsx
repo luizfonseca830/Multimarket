@@ -24,27 +24,36 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
     setIsLoading(true);
 
     try {
-      const response = await apiRequest("POST", "/api/admin/login", { username, password });
+      console.log("Making login request...");
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
       
-      if (response.success) {
-        localStorage.setItem("admin-token", response.token);
+      const data = await response.json();
+      console.log("Login response:", data);
+      
+      if (data.success) {
+        localStorage.setItem("admin-token", data.token);
+        console.log("Token saved to localStorage");
+        console.log("Calling onLoginSuccess callback immediately");
+        onLoginSuccess();
         toast({
           title: "Login realizado com sucesso!",
           description: "Bem-vindo ao painel administrativo.",
         });
-        // Chamar onLoginSuccess após o toast
-        setTimeout(() => {
-          console.log("Calling onLoginSuccess callback");
-          onLoginSuccess();
-        }, 500);
       } else {
         toast({
           title: "Erro no login",
-          description: response.message || "Usuário ou senha incorretos.",
+          description: data.message || "Usuário ou senha incorretos.",
           variant: "destructive",
         });
       }
     } catch (error) {
+      console.error("Login error:", error);
       toast({
         title: "Erro no login",
         description: "Erro ao conectar com o servidor.",
