@@ -277,34 +277,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/login", async (req, res) => {
     try {
       const { username, password } = req.body;
-      console.log("Login attempt:", { username, password });
       
       if (!username || !password) {
-        console.log("Missing username or password");
         return res.status(400).json({ message: "Username and password are required" });
       }
       
       const admin = await storage.authenticateAdmin(username, password);
-      console.log("Admin found:", admin);
       
       if (admin) {
         // Generate a simple token (in production, use proper JWT)
         const token = crypto.randomBytes(32).toString('hex');
-        console.log("Login successful for:", admin.username);
         res.json({ 
           success: true, 
           token,
           admin: { id: admin.id, username: admin.username }
         });
       } else {
-        console.log("Authentication failed for username:", username);
         res.status(401).json({ 
           success: false, 
           message: "Invalid credentials" 
         });
       }
     } catch (error: any) {
-      console.error("Authentication error:", error);
       res.status(500).json({ message: "Error during authentication: " + error.message });
     }
   });

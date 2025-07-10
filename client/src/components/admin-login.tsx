@@ -24,17 +24,18 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
     setIsLoading(true);
 
     try {
-      console.log("Tentando login com:", { username, password });
       const response = await apiRequest("POST", "/api/admin/login", { username, password });
-      console.log("Resposta do servidor:", response);
       
       if (response.success) {
         localStorage.setItem("admin-token", response.token);
-        onLoginSuccess();
         toast({
           title: "Login realizado com sucesso!",
           description: "Bem-vindo ao painel administrativo.",
         });
+        // Chamar onLoginSuccess após o toast
+        setTimeout(() => {
+          onLoginSuccess();
+        }, 500);
       } else {
         toast({
           title: "Erro no login",
@@ -43,7 +44,6 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
         });
       }
     } catch (error) {
-      console.error("Erro no login:", error);
       toast({
         title: "Erro no login",
         description: "Erro ao conectar com o servidor.",
