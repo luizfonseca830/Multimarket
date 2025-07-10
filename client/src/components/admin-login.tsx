@@ -24,7 +24,9 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
     setIsLoading(true);
 
     try {
+      console.log("Tentando login com:", { username, password });
       const response = await apiRequest("POST", "/api/admin/login", { username, password });
+      console.log("Resposta do servidor:", response);
       
       if (response.success) {
         localStorage.setItem("admin-token", response.token);
@@ -36,11 +38,12 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
       } else {
         toast({
           title: "Erro no login",
-          description: "Usuário ou senha incorretos.",
+          description: response.message || "Usuário ou senha incorretos.",
           variant: "destructive",
         });
       }
     } catch (error) {
+      console.error("Erro no login:", error);
       toast({
         title: "Erro no login",
         description: "Erro ao conectar com o servidor.",
