@@ -32,6 +32,12 @@ export interface IStorage {
   getEstablishments(): Promise<Establishment[]>;
   getEstablishment(id: number): Promise<Establishment | undefined>;
   createEstablishment(establishment: InsertEstablishment): Promise<Establishment>;
+  updateEstablishmentPaymentConfig(id: number, config: {
+    pagarmeApiKey?: string;
+    pixKey?: string;
+    deliveryFee?: string;
+    cnpj?: string;
+  }): Promise<Establishment>;
   
   // Categories
   getCategoriesByEstablishment(establishmentId: number): Promise<Category[]>;
@@ -91,6 +97,24 @@ export class DatabaseStorage implements IStorage {
   async createEstablishment(establishment: InsertEstablishment): Promise<Establishment> {
     const [newEstablishment] = await db.insert(establishments).values(establishment).returning();
     return newEstablishment;
+  }
+
+  async updateEstablishmentPaymentConfig(id: number, config: {
+    pagarmeApiKey?: string;
+    pixKey?: string;
+    deliveryFee?: string;
+    cnpj?: string;
+  }): Promise<Establishment> {
+    const [updatedEstablishment] = await db.update(establishments)
+      .set({
+        pagarmeApiKey: config.pagarmeApiKey,
+        pixKey: config.pixKey,
+        deliveryFee: config.deliveryFee,
+        cnpj: config.cnpj
+      })
+      .where(eq(establishments.id, id))
+      .returning();
+    return updatedEstablishment;
   }
 
   // Categories

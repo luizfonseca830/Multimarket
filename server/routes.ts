@@ -5,8 +5,7 @@ import { storage } from "./storage";
 import { insertOrderSchema, insertOrderItemSchema } from "@shared/schema";
 import { z } from "zod";
 import crypto from 'crypto';
-// @ts-ignore - PagarMe types not available
-import pagarme from "pagarme";
+import axios from 'axios';
 
 // Use test key if no Stripe secret is provided
 const stripeKey = process.env.STRIPE_SECRET_KEY || 'sk_test_51234567890';
@@ -337,83 +336,119 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // PagarMe Integration
+  // PagarMe v5 Integration
   app.post("/api/pagarme/create-order", async (req, res) => {
     try {
       const { customer, address, items, payment_method, card, establishment_id, total_amount } = req.body;
 
       // Validar dados obrigatórios
       if (!customer || !address || !items || !payment_method || !establishment_id) {
+        console.log('Dados recebidos:', { customer, address, items, payment_method, establishment_id });
         return res.status(400).json({ 
           success: false, 
-          error: "Dados obrigatórios não fornecidos" 
+          error: "Dados obrigatórios não fornecidos",
+          received: { customer: !!customer, address: !!address, items: !!items, payment_method: !!payment_method, establishment_id: !!establishment_id }
         });
       }
 
-      // Para sandbox/teste, usar chave de teste do PagarMe
-      const client = await pagarme.client.connect({
-        api_key: process.env.PAGARME_API_KEY || 'ak_test_abcdefghijklmnopqrstuvwxyz123456'
-      });
+      // Buscar configurações do estabelecimento
+      const establishment = await storage.getEstablishment(establishment_id);
+      if (!establishment) {
+        return res.status(400).json({
+          success: false,
+          error: "Estabelecimento não encontrado"
+        });
+      }
 
-      // Criar transação
-      const transaction = {
-        amount: total_amount,
-        card_number: payment_method === 'credit_card' ? card?.number?.replace(/\s/g, '') : undefined,
-        card_cvv: payment_method === 'credit_card' ? card?.cvv : undefined,
-        card_expiration_date: payment_method === 'credit_card' ? 
-          `${card?.exp_month?.padStart(2, '0')}${card?.exp_year}` : undefined,
-        card_holder_name: payment_method === 'credit_card' ? card?.holder_name : undefined,
-        customer: {
-          external_id: customer.document,
-          name: customer.name,
-          type: 'individual',
-          country: 'br',
-          email: customer.email,
-          phone_numbers: [customer.phone],
-          documents: [{
-            type: 'cpf',
-            number: customer.document.replace(/\D/g, '')
-          }]
-        },
-        billing: {
-          name: customer.name,
-          address: {
-            country: 'br',
-            state: address.state,
-            city: address.city,
-            neighborhood: address.neighborhood,
-            street: address.street,
-            street_number: address.number,
-            zipcode: address.zipcode.replace(/\D/g, '')
+      // Usar chave PagarMe específica do estabelecimento ou fallback para chave global
+      const apiKey = establishment.pagarmeApiKey || process.env.PAGARME_API_KEY || 'sk_test_abcdefghijklmnopqrstuvwxyz';
+      const authHeader = Buffer.from(`${apiKey}:`).toString('base64');
+
+      // Preparar dados do cliente
+      const customerData = {
+        name: customer.name,
+        email: customer.email,
+        document: customer.document.replace(/\D/g, ''),
+        type: 'individual',
+        phones: {
+          mobile_phone: {
+            country_code: '55',
+            area_code: customer.phone.substring(0, 2),
+            number: customer.phone.substring(2)
           }
         },
-        shipping: {
-          name: customer.name,
-          fee: 500, // Taxa de entrega em centavos (R$ 5,00)
-          address: {
-            country: 'br',
-            state: address.state,
-            city: address.city,
-            neighborhood: address.neighborhood,
-            street: address.street,
-            street_number: address.number,
-            zipcode: address.zipcode.replace(/\D/g, '')
-          }
-        },
-        items: items.map((item: any) => ({
-          id: item.description.replace(/\s/g, '_').toLowerCase(),
-          title: item.description,
-          unit_price: item.price,
-          quantity: item.quantity,
-          tangible: true
-        })),
-        payment_method: payment_method,
-        async: false
+        address: {
+          line_1: `${address.number}, ${address.street}, ${address.neighborhood}`,
+          line_2: address.complement || '',
+          zip_code: address.zipcode.replace(/\D/g, ''),
+          city: address.city,
+          state: address.state,
+          country: 'BR'
+        }
       };
 
-      const result = await client.transactions.create(transaction);
+      // Preparar itens do pedido
+      const orderItems = items.map((item: any) => ({
+        code: item.id,
+        description: item.description,
+        amount: item.price,
+        quantity: item.quantity
+      }));
 
-      if (result.status === 'paid' || result.status === 'waiting_payment') {
+      // Preparar pagamento
+      let paymentData: any = {};
+
+      if (payment_method === 'credit_card') {
+        paymentData = {
+          payment_method: 'credit_card',
+          credit_card: {
+            card: {
+              number: card.number.replace(/\s/g, ''),
+              holder_name: card.holder_name,
+              exp_month: parseInt(card.exp_month),
+              exp_year: parseInt(card.exp_year),
+              cvv: card.cvv
+            }
+          }
+        };
+      } else if (payment_method === 'pix') {
+        paymentData = {
+          payment_method: 'pix',
+          pix: {
+            expires_in: 3600 // 1 hora
+          }
+        };
+      }
+
+      // Criar pedido
+      const orderRequest = {
+        code: `ORDER_${Date.now()}`,
+        items: orderItems,
+        customer: customerData,
+        payments: [{
+          amount: total_amount,
+          ...paymentData
+        }],
+        shipping: {
+          amount: Math.round(parseFloat(establishment.deliveryFee || '5.00') * 100), // Taxa de entrega em centavos
+          description: `Entrega ${establishment.name}`,
+          recipient_name: customer.name,
+          recipient_phone: customer.phone,
+          address: customerData.address
+        }
+      };
+
+      console.log('Criando pedido PagarMe:', JSON.stringify(orderRequest, null, 2));
+
+      // Fazer requisição HTTP direta para API do PagarMe v5
+      const result = await axios.post('https://api.pagar.me/core/v5/orders', orderRequest, {
+        headers: {
+          'Authorization': `Basic ${authHeader}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (result.data && (result.data.status === 'paid' || result.data.status === 'pending')) {
         // Salvar pedido no banco de dados
         const orderData = {
           customerName: customer.name,
@@ -429,13 +464,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             zipcode: address.zipcode
           },
           paymentMethod: payment_method,
-          paymentStatus: result.status === 'paid' ? 'paid' : 'pending',
+          paymentStatus: result.data.status === 'paid' ? 'paid' : 'pending',
           orderStatus: 'processing',
           totalAmount: (total_amount / 100).toString(),
-          deliveryFee: '5.00',
+          deliveryFee: establishment.deliveryFee || '5.00',
           establishmentId: establishment_id,
-          pagarmeTransactionId: result.id.toString(),
-          pagarmeOrderId: result.id.toString()
+          pagarmeTransactionId: result.data.id,
+          pagarmeOrderId: result.data.code
         };
 
         const order = await storage.createOrder(orderData);
@@ -444,31 +479,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         for (const item of items) {
           await storage.createOrderItem({
             orderId: order.id,
-            productId: parseInt(item.id) || 1, // Fallback se não tiver ID
+            productId: parseInt(item.id) || 1,
             quantity: item.quantity,
             price: (item.price / 100).toString()
           });
         }
 
-        res.json({
+        const response: any = {
           success: true,
           order_id: order.id,
-          transaction_id: result.id,
-          status: result.status,
-          payment_method: payment_method,
-          ...(payment_method === 'pix' && {
-            pix_qr_code: result.pix_qr_code,
-            pix_expiration_date: result.pix_expiration_date
-          })
-        });
+          transaction_id: result.data.id,
+          status: result.data.status,
+          payment_method: payment_method
+        };
+
+        // Para PIX, incluir dados do QR Code
+        if (payment_method === 'pix' && result.data.charges && result.data.charges[0]) {
+          const charge = result.data.charges[0];
+          if (charge.last_transaction && charge.last_transaction.qr_code) {
+            response.pix_qr_code = charge.last_transaction.qr_code;
+            response.pix_qr_code_url = charge.last_transaction.qr_code_url;
+          }
+        }
+
+        res.json(response);
       } else {
+        const errorMessage = result.data?.charges?.[0]?.last_transaction?.gateway_response?.errors?.[0]?.message || 'Pagamento rejeitado';
         res.status(400).json({
           success: false,
-          error: result.refuse_reason || 'Pagamento rejeitado'
+          error: errorMessage
         });
       }
     } catch (error: any) {
-      console.error('Erro PagarMe:', error);
+      console.error('Erro PagarMe v5:', error);
       res.status(500).json({
         success: false,
         error: error.message || 'Erro interno do servidor'
@@ -476,23 +519,110 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Webhook do PagarMe para receber atualizações de status
+  // Webhook do PagarMe v5 para receber atualizações de status
   app.post("/api/pagarme/webhook", async (req, res) => {
     try {
-      const { object, current_status, id } = req.body;
+      const { type, data } = req.body;
 
-      if (object === 'transaction') {
-        // Atualizar status do pedido baseado na transação
-        await storage.updateOrderByPagarmeId(id.toString(), {
-          paymentStatus: current_status === 'paid' ? 'paid' : 
-                         current_status === 'refused' ? 'failed' : 'pending'
+      console.log('Webhook PagarMe recebido:', { type, data });
+
+      if (type === 'order.paid' || type === 'order.payment_failed' || type === 'charge.paid') {
+        const orderId = data.id || data.order_id;
+        let paymentStatus = 'pending';
+
+        switch (type) {
+          case 'order.paid':
+          case 'charge.paid':
+            paymentStatus = 'paid';
+            break;
+          case 'order.payment_failed':
+            paymentStatus = 'failed';
+            break;
+        }
+
+        // Atualizar status do pedido baseado no webhook
+        await storage.updateOrderByPagarmeId(orderId.toString(), {
+          paymentStatus
         });
       }
 
       res.status(200).json({ received: true });
     } catch (error: any) {
-      console.error('Erro webhook PagarMe:', error);
+      console.error('Erro webhook PagarMe v5:', error);
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Admin - Configurar credenciais PagarMe por estabelecimento
+  app.put("/api/admin/establishments/:id/pagarme", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { pagarmeApiKey, pixKey, deliveryFee, cnpj } = req.body;
+
+      // Buscar estabelecimento
+      const establishment = await storage.getEstablishment(parseInt(id));
+      if (!establishment) {
+        return res.status(404).json({ 
+          success: false, 
+          error: "Estabelecimento não encontrado" 
+        });
+      }
+
+      // Atualizar configurações PagarMe
+      const updatedEstablishment = await storage.updateEstablishmentPaymentConfig(parseInt(id), {
+        pagarmeApiKey,
+        pixKey,
+        deliveryFee: deliveryFee || '5.00',
+        cnpj
+      });
+
+      res.json({
+        success: true,
+        establishment: {
+          id: updatedEstablishment.id,
+          name: updatedEstablishment.name,
+          deliveryFee: updatedEstablishment.deliveryFee,
+          hasPaymentConfig: !!updatedEstablishment.pagarmeApiKey
+        }
+      });
+    } catch (error: any) {
+      console.error('Erro ao configurar PagarMe:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Erro interno do servidor'
+      });
+    }
+  });
+
+  // Admin - Listar configurações de pagamento por estabelecimento
+  app.get("/api/admin/establishments/:id/pagarme", async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      const establishment = await storage.getEstablishment(parseInt(id));
+      if (!establishment) {
+        return res.status(404).json({ 
+          success: false, 
+          error: "Estabelecimento não encontrado" 
+        });
+      }
+
+      res.json({
+        success: true,
+        config: {
+          establishmentName: establishment.name,
+          hasPaymentConfig: !!establishment.pagarmeApiKey,
+          deliveryFee: establishment.deliveryFee || '5.00',
+          pixKey: establishment.pixKey ? '***' + establishment.pixKey.slice(-4) : null,
+          cnpj: establishment.cnpj
+        }
+      });
+    } catch (error: any) {
+      console.error('Erro ao buscar configurações:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Erro interno do servidor'
+      });
     }
   });
 

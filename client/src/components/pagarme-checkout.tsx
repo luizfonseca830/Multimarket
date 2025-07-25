@@ -120,10 +120,10 @@ export function PagarmeCheckoutModal({ isOpen, onClose, cartItems, total, establ
           <div className="bg-slate-50 p-4 rounded-lg">
             <h3 className="font-semibold mb-3">Resumo do Pedido</h3>
             <div className="space-y-2">
-              {cartItems.map((item) => (
-                <div key={`${item.product.id}-${item.establishmentId}`} className="flex justify-between text-sm">
+              {cartItems.map((item, index) => (
+                <div key={`${item.product.id}-${index}`} className="flex justify-between text-sm">
                   <span>{item.quantity}x {item.product.name}</span>
-                  <span>R$ {(item.product.price * item.quantity).toFixed(2)}</span>
+                  <span>R$ {(Number(item.product.price) * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
               <Separator />

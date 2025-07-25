@@ -14,6 +14,7 @@ export const establishments = pgTable("establishments", {
   // Configurações de pagamento específicas por estabelecimento
   pagarmeApiKey: text("pagarme_api_key"), // Chave API específica do estabelecimento
   pixKey: text("pix_key"), // Chave PIX do estabelecimento
+  cnpj: text("cnpj"), // CNPJ do estabelecimento
   deliveryFee: decimal("delivery_fee", { precision: 10, scale: 2 }).default('5.00'),
 });
 

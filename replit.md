@@ -18,6 +18,34 @@ Idioma: Português (Brasileiro)
 
 ## Mudanças Recentes (Janeiro 2025)
 
+### Integração PagarMe v5 e Sistema de Pagamento por Estabelecimento (Janeiro 2025)
+- **Migração para PagarMe v5**: Sistema totalmente atualizado para usar a nova API do PagarMe
+  - Implementação via API REST direta (axios) para maior confiabilidade
+  - Suporte completo para pagamentos PIX e cartão de crédito
+  - Webhook configurado para receber atualizações de status de pagamento v5
+- **Sistema de Pagamento por Estabelecimento**: Configurações fiscais independentes
+  - **Chave PagarMe específica por estabelecimento**: Cada estabelecimento pode ter sua própria conta PagarMe
+  - **Taxa de entrega personalizada**: Configurável por estabelecimento
+  - **Chave PIX individualizada**: Cada estabelecimento recebe pagamentos em sua própria chave PIX
+  - **CNPJ por estabelecimento**: Suporte a questões fiscais e tributárias
+  - **API de configuração administrativa**: Endpoints para configurar credenciais por estabelecimento
+- **Sistema de Carrinho Individualizado**: Carrinho específico por estabelecimento
+  - Cada estabelecimento possui seu próprio carrinho isolado
+  - Contexto de carrinho atualizado para gerenciar múltiplos carrinhos
+  - Interface de checkout adaptada para mostrar produtos do estabelecimento selecionado
+- **Melhorias no Checkout**:
+  - Modal de checkout redesenhado para PagarMe v5
+  - Formulário completo de dados do cliente e endereço
+  - Validação de dados obrigatórios
+  - Processamento de pagamentos PIX com QR Code
+  - Taxa de entrega dinâmica baseada no estabelecimento
+- **Esquema de Banco Atualizado**:
+  - Campos pagarme_transaction_id e pagarme_order_id adicionados à tabela orders
+  - Campos de configuração PagarMe por estabelecimento (pagarme_api_key, pix_key, cnpj, delivery_fee)
+  - Estrutura preparada para múltiplos métodos de pagamento por estabelecimento
+
+## Mudanças Recentes (Janeiro 2025)
+
 ### Identidade Visual GRUPO ANGELIN e Melhorias (Atual - Janeiro 2025)
 - **Nova Identidade Visual**: Aplicada a marca "GRUPO ANGELIN" em todo o sistema
   - Esquema de cores baseado na logo: dourado/âmbar e preto
