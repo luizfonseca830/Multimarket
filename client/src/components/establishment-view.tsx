@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +16,11 @@ export function EstablishmentView({ establishment, onBack }: EstablishmentViewPr
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<string>('best_sellers');
   const { dispatch } = useCart();
+
+  // Define o estabelecimento atual no contexto do carrinho
+  useEffect(() => {
+    dispatch({ type: "SET_CURRENT_ESTABLISHMENT", establishmentId: establishment.id });
+  }, [establishment.id, dispatch]);
 
   const { data: categories, isLoading: categoriesLoading } = useQuery<Category[]>({
     queryKey: ['/api/establishments', establishment.id, 'categories'],
@@ -37,7 +42,11 @@ export function EstablishmentView({ establishment, onBack }: EstablishmentViewPr
     : products;
 
   const handleAddToCart = (product: ProductWithCategory) => {
-    dispatch({ type: "ADD_ITEM", product });
+    dispatch({ 
+      type: "ADD_ITEM", 
+      product, 
+      establishmentId: establishment.id 
+    });
   };
 
   return (

@@ -13,8 +13,9 @@ interface HeaderProps {
 }
 
 export function Header({ selectedEstablishment, onEstablishmentChange, onSearch, onHome }: HeaderProps) {
-  const { state: cartState, dispatch } = useCart();
+  const { state: cartState, dispatch, getCurrentCart } = useCart();
   const [searchQuery, setSearchQuery] = useState("");
+  const currentCart = getCurrentCart() || { items: [] };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,9 +63,9 @@ export function Header({ selectedEstablishment, onEstablishmentChange, onSearch,
                 size="sm"
               >
                 <ShoppingCart size={16} />
-                {cartState.items.length > 0 && (
+                {currentCart.items.length > 0 && (
                   <Badge className="absolute -top-2 -right-2 bg-red-500 text-white text-xs">
-                    {cartState.items.reduce((sum, item) => sum + item.quantity, 0)}
+                    {currentCart.items.reduce((sum, item) => sum + item.quantity, 0)}
                   </Badge>
                 )}
               </Button>
@@ -147,9 +148,9 @@ export function Header({ selectedEstablishment, onEstablishmentChange, onSearch,
               >
                 <ShoppingCart className="mr-2" size={16} />
                 <span className="hidden sm:inline">Carrinho</span>
-                {cartState.items.length > 0 && (
+                {currentCart.items.length > 0 && (
                   <Badge className="absolute -top-2 -right-2 bg-red-500 text-white">
-                    {cartState.items.reduce((sum, item) => sum + item.quantity, 0)}
+                    {currentCart.items.reduce((sum, item) => sum + item.quantity, 0)}
                   </Badge>
                 )}
               </Button>

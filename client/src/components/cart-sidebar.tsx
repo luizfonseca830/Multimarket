@@ -4,22 +4,34 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/lib/cart-context";
 import { useState } from "react";
-import { CheckoutModal } from "./checkout-modal";
+import { PagarmeCheckoutModal } from "./pagarme-checkout";
 
 export function CartSidebar() {
-  const { state, dispatch } = useCart();
+  const { state, dispatch, getCurrentCart } = useCart();
   const [showCheckout, setShowCheckout] = useState(false);
 
+  const currentCart = getCurrentCart();  
   const deliveryFee = 5.00;
-  const subtotal = state.total;
+  const subtotal = currentCart.total;
   const total = subtotal + deliveryFee;
 
   const updateQuantity = (productId: number, newQuantity: number) => {
-    dispatch({ type: "UPDATE_QUANTITY", productId, quantity: newQuantity });
+    if (!state.currentEstablishmentId) return;
+    dispatch({ 
+      type: "UPDATE_QUANTITY", 
+      productId, 
+      quantity: newQuantity,
+      establishmentId: state.currentEstablishmentId 
+    });
   };
 
   const removeItem = (productId: number) => {
-    dispatch({ type: "REMOVE_ITEM", productId });
+    if (!state.currentEstablishmentId) return;
+    dispatch({ 
+      type: "REMOVE_ITEM", 
+      productId,
+      establishmentId: state.currentEstablishmentId 
+    });
   };
 
   const handleCheckout = () => {
@@ -48,7 +60,7 @@ export function CartSidebar() {
 
             {/* Cart Items */}
             <div className="flex-1 overflow-y-auto p-6">
-              {state.items.length === 0 ? (
+              {currentCart.items.length === 0 ? (
                 <div className="text-center py-12">
                   <ShoppingBag className="mx-auto mb-4 text-slate-400" size={48} />
                   <p className="text-slate-500">Seu carrinho está vazio</p>
@@ -56,7 +68,7 @@ export function CartSidebar() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {state.items.map((item) => (
+                  {currentCart.items.map((item) => (
                     <div key={item.product.id} className="flex items-center space-x-4 p-4 bg-slate-50 rounded-lg">
                       <img
                         src={item.product.imageUrl || `https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100`}
@@ -111,7 +123,7 @@ export function CartSidebar() {
             </div>
 
             {/* Footer */}
-            {state.items.length > 0 && (
+            {currentCart.items.length > 0 && (
               <div className="border-t border-slate-200 p-6">
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between text-slate-600">
@@ -139,11 +151,12 @@ export function CartSidebar() {
       </div>
 
       {showCheckout && (
-        <CheckoutModal
+        <PagarmeCheckoutModal
           isOpen={showCheckout}
           onClose={() => setShowCheckout(false)}
-          cartItems={state.items}
+          cartItems={currentCart.items}
           total={total}
+          establishmentId={currentCart.establishmentId}
         />
       )}
     </>

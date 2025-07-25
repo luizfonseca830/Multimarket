@@ -11,6 +11,10 @@ export const establishments = pgTable("establishments", {
   description: text("description").notNull(),
   icon: text("icon").notNull(),
   isActive: boolean("is_active").default(true),
+  // Configurações de pagamento específicas por estabelecimento
+  pagarmeApiKey: text("pagarme_api_key"), // Chave API específica do estabelecimento
+  pixKey: text("pix_key"), // Chave PIX do estabelecimento
+  deliveryFee: decimal("delivery_fee", { precision: 10, scale: 2 }).default('5.00'),
 });
 
 // Categories table
@@ -53,6 +57,8 @@ export const orders = pgTable("orders", {
   deliveryFee: decimal("delivery_fee", { precision: 10, scale: 2 }).default('5.00'),
   establishmentId: integer("establishment_id").references(() => establishments.id).notNull(),
   stripePaymentIntentId: text("stripe_payment_intent_id"),
+  pagarmeTransactionId: text("pagarme_transaction_id"),
+  pagarmeOrderId: text("pagarme_order_id"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

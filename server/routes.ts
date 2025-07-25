@@ -5,6 +5,8 @@ import { storage } from "./storage";
 import { insertOrderSchema, insertOrderItemSchema } from "@shared/schema";
 import { z } from "zod";
 import crypto from 'crypto';
+// @ts-ignore - PagarMe types not available
+import pagarme from "pagarme";
 
 // Use test key if no Stripe secret is provided
 const stripeKey = process.env.STRIPE_SECRET_KEY || 'sk_test_51234567890';
@@ -332,6 +334,165 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     } catch (error: any) {
       res.status(500).json({ message: "Error during password recovery: " + error.message });
+    }
+  });
+
+  // PagarMe Integration
+  app.post("/api/pagarme/create-order", async (req, res) => {
+    try {
+      const { customer, address, items, payment_method, card, establishment_id, total_amount } = req.body;
+
+      // Validar dados obrigatórios
+      if (!customer || !address || !items || !payment_method || !establishment_id) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "Dados obrigatórios não fornecidos" 
+        });
+      }
+
+      // Para sandbox/teste, usar chave de teste do PagarMe
+      const client = await pagarme.client.connect({
+        api_key: process.env.PAGARME_API_KEY || 'ak_test_abcdefghijklmnopqrstuvwxyz123456'
+      });
+
+      // Criar transação
+      const transaction = {
+        amount: total_amount,
+        card_number: payment_method === 'credit_card' ? card?.number?.replace(/\s/g, '') : undefined,
+        card_cvv: payment_method === 'credit_card' ? card?.cvv : undefined,
+        card_expiration_date: payment_method === 'credit_card' ? 
+          `${card?.exp_month?.padStart(2, '0')}${card?.exp_year}` : undefined,
+        card_holder_name: payment_method === 'credit_card' ? card?.holder_name : undefined,
+        customer: {
+          external_id: customer.document,
+          name: customer.name,
+          type: 'individual',
+          country: 'br',
+          email: customer.email,
+          phone_numbers: [customer.phone],
+          documents: [{
+            type: 'cpf',
+            number: customer.document.replace(/\D/g, '')
+          }]
+        },
+        billing: {
+          name: customer.name,
+          address: {
+            country: 'br',
+            state: address.state,
+            city: address.city,
+            neighborhood: address.neighborhood,
+            street: address.street,
+            street_number: address.number,
+            zipcode: address.zipcode.replace(/\D/g, '')
+          }
+        },
+        shipping: {
+          name: customer.name,
+          fee: 500, // Taxa de entrega em centavos (R$ 5,00)
+          address: {
+            country: 'br',
+            state: address.state,
+            city: address.city,
+            neighborhood: address.neighborhood,
+            street: address.street,
+            street_number: address.number,
+            zipcode: address.zipcode.replace(/\D/g, '')
+          }
+        },
+        items: items.map((item: any) => ({
+          id: item.description.replace(/\s/g, '_').toLowerCase(),
+          title: item.description,
+          unit_price: item.price,
+          quantity: item.quantity,
+          tangible: true
+        })),
+        payment_method: payment_method,
+        async: false
+      };
+
+      const result = await client.transactions.create(transaction);
+
+      if (result.status === 'paid' || result.status === 'waiting_payment') {
+        // Salvar pedido no banco de dados
+        const orderData = {
+          customerName: customer.name,
+          customerEmail: customer.email,
+          customerPhone: customer.phone,
+          deliveryAddress: {
+            street: address.street,
+            number: address.number,
+            complement: address.complement,
+            neighborhood: address.neighborhood,
+            city: address.city,
+            state: address.state,
+            zipcode: address.zipcode
+          },
+          paymentMethod: payment_method,
+          paymentStatus: result.status === 'paid' ? 'paid' : 'pending',
+          orderStatus: 'processing',
+          totalAmount: (total_amount / 100).toString(),
+          deliveryFee: '5.00',
+          establishmentId: establishment_id,
+          pagarmeTransactionId: result.id.toString(),
+          pagarmeOrderId: result.id.toString()
+        };
+
+        const order = await storage.createOrder(orderData);
+
+        // Criar itens do pedido
+        for (const item of items) {
+          await storage.createOrderItem({
+            orderId: order.id,
+            productId: parseInt(item.id) || 1, // Fallback se não tiver ID
+            quantity: item.quantity,
+            price: (item.price / 100).toString()
+          });
+        }
+
+        res.json({
+          success: true,
+          order_id: order.id,
+          transaction_id: result.id,
+          status: result.status,
+          payment_method: payment_method,
+          ...(payment_method === 'pix' && {
+            pix_qr_code: result.pix_qr_code,
+            pix_expiration_date: result.pix_expiration_date
+          })
+        });
+      } else {
+        res.status(400).json({
+          success: false,
+          error: result.refuse_reason || 'Pagamento rejeitado'
+        });
+      }
+    } catch (error: any) {
+      console.error('Erro PagarMe:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Erro interno do servidor'
+      });
+    }
+  });
+
+  // Webhook do PagarMe para receber atualizações de status
+  app.post("/api/pagarme/webhook", async (req, res) => {
+    try {
+      const { object, current_status, id } = req.body;
+
+      if (object === 'transaction') {
+        // Atualizar status do pedido baseado na transação
+        await storage.updateOrderByPagarmeId(id.toString(), {
+          paymentStatus: current_status === 'paid' ? 'paid' : 
+                         current_status === 'refused' ? 'failed' : 'pending'
+        });
+      }
+
+      res.status(200).json({ received: true });
+    } catch (error: any) {
+      console.error('Erro webhook PagarMe:', error);
+      res.status(500).json({ error: error.message });
     }
   });
 

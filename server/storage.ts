@@ -410,6 +410,15 @@ export class DatabaseStorage implements IStorage {
     return updatedOrder;
   }
 
+  // Método específico para atualizar pedidos por ID do PagarMe
+  async updateOrderByPagarmeId(pagarmeTransactionId: string, updateData: Partial<InsertOrder>): Promise<Order | undefined> {
+    const [updatedOrder] = await db.update(orders)
+      .set(updateData)
+      .where(eq(orders.pagarmeTransactionId, pagarmeTransactionId))
+      .returning();
+    return updatedOrder;
+  }
+
   // Order Items
   async createOrderItem(orderItem: InsertOrderItem): Promise<OrderItem> {
     const [newOrderItem] = await db.insert(orderItems).values(orderItem).returning();
